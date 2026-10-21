@@ -80,6 +80,9 @@ a { text-decoration: none; color: #326276; }
 .help-dialog h2 { margin: 0 0 10px; color: var(--forest); font: 24px Georgia, serif; }
 .help-dialog p { margin: 0; color: var(--muted); }
 .help-dialog-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 9px; margin-top: 20px; }
+.help-dialog-option { display: flex; align-items: center; gap: 9px; margin-top: 15px; color: var(--ink); font-weight: 700; }
+.help-dialog-option input { width: 20px; min-height: 20px; margin: 0; accent-color: var(--forest-2); }
+.help-dialog-status { margin-top: 10px !important; color: #9a392c !important; font-size: 13px; }
 /* Full-screen calculator gate and app exit control. */
 .calculator-dialog { --calculator-bg: #000; --calculator-key: #303033; --calculator-function-key: #59595d; --calculator-orange: #ff9500; position: fixed; inset: 0; width: 100vw; max-width: none; height: 100vh; height: 100dvh; max-height: none; margin: 0; padding: max(14px, env(safe-area-inset-top)) max(15px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(15px, env(safe-area-inset-left)); border: 0; border-radius: 0; color: white; background: var(--calculator-bg); box-shadow: none; overflow: hidden; scrollbar-width: none; color-scheme: dark; }
 .calculator-dialog::-webkit-scrollbar { display: none; }
@@ -228,6 +231,17 @@ details.process-stage summary { padding: 15px 3px; color: var(--forest); cursor:
 .process-block { padding: 12px; border-left: 3px solid #9ebdad; background: #f7f9f7; }
 .process-block h4 { margin: 0 0 5px; color: var(--forest); font-size: 12px; text-transform: uppercase; letter-spacing: .5px; }
 .process-block p { margin: 0; color: #4f5e58; font-size: 13px; }
+.support-directory > summary { color: var(--forest); cursor: pointer; font: 21px Georgia, "Times New Roman", serif; }
+.support-directory[open] > summary { margin-bottom: 12px; }
+.support-directory-lede { margin: 0 0 10px; color: var(--muted); font-size: 13px; }
+.support-service-list { display: grid; gap: 7px; margin: 0 0 16px; }
+.support-service { border: 1px solid var(--line); border-radius: 5px; background: #fff; }
+.support-service > summary { padding: 10px 12px; color: var(--forest); cursor: pointer; font-weight: 700; overflow-wrap: anywhere; }
+.support-service[open] > summary { border-bottom: 1px solid var(--line); }
+.support-service-content { display: grid; gap: 6px; padding: 10px 12px 12px; font-size: 13px; overflow-wrap: anywhere; }
+.support-service-content p { margin: 0; }
+.support-service-content a { text-decoration: underline; }
+.support-source { margin: 14px 0 0; color: var(--muted); font-size: 12px; }
 .notice { margin: 15px 0 0; padding: 13px 15px; border-left: 4px solid #c8882e; border-radius: 0 5px 5px 0; background: var(--gold-soft); color: #664d24; font-size: 13px; }
 .danger-note { border-left-color: var(--coral); background: var(--coral-soft); color: #71392f; }
 .table-wrap { overflow-x: auto; }
@@ -418,6 +432,8 @@ tr th { background-color: #f5f5f5; color: #34433e; }
     <dialog class="help-dialog" id="appHelpDialog" aria-labelledby="appHelpTitle" aria-describedby="appHelpDescription">
       <h2 id="appHelpTitle">Would you like help using this app?</h2>
       <p id="appHelpDescription">If you would like help learning how the app works, ask your support worker to explain it and go through the app with you.</p>
+      <label class="help-dialog-option"><input id="hideAppHelp" type="checkbox">Do not show this message again</label>
+      <p class="help-dialog-status" id="appHelpStorageStatus" role="status" aria-live="polite" hidden></p>
       <form method="dialog" class="help-dialog-actions">
         <button class="btn" type="submit" value="yes">Yes, I’ll ask my support worker</button>
         <button class="btn btn-primary" type="submit" value="no">No, continue</button>
@@ -942,21 +958,20 @@ tr th { background-color: #f5f5f5; color: #34433e; }
       <section class="panel"><div class="panel-heading"><div><h2>Grounding exercise</h2><p>Take a moment to notice what is around you. Stop whenever you wish.</p></div></div><ol><li>Name five things you can see.</li><li>Notice four things you can feel beneath your hands or feet.</li><li>Listen for three sounds around you.</li><li>Notice two scents, or take two slow comfortable breaths.</li><li>Name one thing you need right now.</li></ol><button class="btn" id="groundingButton" type="button">Start a gentle 60-second pause</button><p id="groundingStatus" role="status" aria-live="polite"></p></section>
       <section class="panel"><div class="panel-heading"><div><h2>Personal safety plan</h2><p>Only save details here if this device is safe for you to use.</p></div></div><label for="safetyPlan">People, places, or steps that may help me feel safer</label><textarea id="safetyPlan" rows="5"></textarea><div class="form-actions"><button class="btn btn-primary" id="saveSafetyButton" type="button">Save safety plan</button><span class="form-message" id="safetyMessage" role="status"></span></div></section>
       <section class="panel">
-        <div class="panel-heading"><div><h2>Sexual assault support services</h2><p>Services listed by Victims of Crime SA. Contact the service directly to confirm availability and suitability.</p></div></div>
+        <div class="panel-heading"><div><h2>Support services</h2><p>South Australian services from the 1800RESPECT directory. Open a category, then select a service to view its contact details.</p></div></div>
         <div class="notice danger-note"><strong>Immediate danger?</strong> Call <a href="tel:000">000</a>.</div>
-        <div class="process-grid" style="margin-top:15px">
-          <div class="process-block"><h4>Yarrow Place — Rape and Sexual Assault Service</h4><p>Inclusive support for people aged 16 and above, including 24-hour crisis response for recent rape or sexual assault, medical care, counselling, advocacy, and support for partners, families, and friends.</p><p>Phone: <a href="tel:1800817421">1800 817 421</a></p><p><a href="https://www.wchn.sa.gov.au/our-network/yarrow-place" target="_blank" rel="noopener">Yarrow Place information</a></p></div>
-          <div class="process-block"><h4>1800RESPECT</h4><p>National counselling, information, and support for people affected by sexual assault, domestic or family violence. Available 24 hours a day, 7 days a week.</p><p>Phone: <a href="tel:1800737732">1800 737 732</a> · <a href="https://www.1800respect.org.au/" target="_blank" rel="noopener">1800RESPECT website</a></p></div>
-          <div class="process-block"><h4>Legal Services Commission Sexual Violence Legal Service</h4><p>Free, confidential legal advice and support in South Australia, including social work support and financial counselling. Available Monday to Friday, 9 am to 4:30 pm.</p><p>Phone: <a href="tel:1300366424">1300 366 424</a> · <a href="https://lsc.sa.gov.au/cb_pages/sexual-violence-legal-service-south-australia.php" target="_blank" rel="noopener">Sexual Violence Legal Service</a></p></div>
-          <div class="process-block"><h4>Shine SA Sexual Healthline</h4><p>Confidential sexual health information. The healthline is available Monday to Friday, 9 am to 12:30 pm. Clinical and counselling services are also available by appointment.</p><p>Phone: <a href="tel:1300883793">1300 883 793</a> · Country callers: <a href="tel:1800188171">1800 188 171</a> · Appointments: <a href="tel:0883005300">(08) 8300 5300</a></p><p><a href="https://www.shinesa.org.au/" target="_blank" rel="noopener">Shine SA</a></p></div>
-          <div class="process-block"><h4>Pregnancy Advisory Centre</h4><p>Information, counselling, and abortion services in South Australia. Open Monday to Friday, 9 am to 4 pm.</p><p>Phone: <a href="tel:0882433999">(08) 8243 3999</a> · Country callers: <a href="tel:1800672966">1800 672 966</a></p><p><a href="https://www.sahealth.sa.gov.au/wps/wcm/connect/public+content/sa+health+internet/services/health+services+for/womens+health+services/unplanned+pregnancy+services/south+australia+abortion+and+support+services" target="_blank" rel="noopener">Pregnancy Advisory Centre information</a></p></div>
-          <div class="process-block"><h4>Adelaide Sexual Health Centre</h4><p>Free, confidential walk-in testing, diagnosis, and treatment for sexually transmitted infections, including HIV. No appointment is needed.</p><p>Phone: <a href="tel:0871172800">(08) 7117 2800</a> · <a href="https://www.sahealth.sa.gov.au/wps/wcm/connect/public+content/sa+health+internet/services/primary+and+specialised+services/sexual+health+services/adelaide+sexual+health+centre/adelaide+sexual+health+centre" target="_blank" rel="noopener">Adelaide Sexual Health Centre</a></p></div>
-          <div class="process-block"><h4>Child Sexual Abuse Counselling Service — Relationships Australia SA</h4><p>Free, confidential counselling and therapeutic support for children, young people, and adults who have survived child sexual abuse, and for partners, carers, and family members.</p><p>Phone: <a href="tel:1800408408">1800 408 408</a> · Email: <a href="mailto:csacounselling@rasa.org.au">csacounselling@rasa.org.au</a></p><p><a href="https://www.rasa.org.au/support/services/child-sexual-abuse-counselling-service/" target="_blank" rel="noopener">Service information</a></p></div>
-          <div class="process-block"><h4>SAMSN — Survivors and Mates Support Network</h4><p>Support for adult men who experienced sexual abuse as children or young people, and for family members and supporters. Includes individual support, counselling, and facilitated groups.</p><p>Phone: <a href="tel:1800472676">1800 472 676</a> · Email: <a href="mailto:support@samsn.org.au">support@samsn.org.au</a> · <a href="https://www.samsn.org.au/recovery-and-healing/" target="_blank" rel="noopener">SAMSN support</a></p></div>
-          <div class="process-block"><h4>The Survivor Hub</h4><p>A survivor-led initiative sharing lived experience and information to support and empower people impacted by sexual assault.</p><p>Email: <a href="mailto:info@thesurvivorhub.org.au">info@thesurvivorhub.org.au</a> · <a href="https://www.thesurvivorhub.org.au/" target="_blank" rel="noopener">The Survivor Hub</a></p></div>
-          <div class="process-block"><h4>What Were You Wearing</h4><p>A charity founded and led by young, marginalised people working to end domestic, family, and sexual violence.</p><p>Email: <a href="mailto:whatwereyouwearingaus@gmail.com">whatwereyouwearingaus@gmail.com</a> · <a href="https://wwywaus.org/" target="_blank" rel="noopener">What Were You Wearing</a></p></div>
-        </div>
-        <p class="source-warning">Source: <a href="https://voc.sa.gov.au/help-and-resources/support-services/sexual-assault-support-services" target="_blank" rel="noopener">Victims of Crime SA — Sexual assault support services</a>. Service details can change; confirm directly with the provider.</p>
+        <details class="support-directory" style="margin-top:16px">
+          <summary>Legal services</summary>
+          <p class="support-directory-lede">Legal service listings for South Australia. Confirm current availability and eligibility directly with each provider.</p>
+          <div class="support-service-list" id="legalSupportServices"></div>
+        </details>
+        <details class="support-directory">
+          <summary>Sexual violence support services</summary>
+          <p class="support-directory-lede">Sexual violence service listings for South Australia. Confirm current availability and suitability directly with each provider.</p>
+          <div class="support-service-list" id="sexualViolenceSupportServices"></div>
+        </details>
+        <p class="support-source">Source: <a href="https://1800respect.org.au/services/search?category=116&amp;state=sa" target="_blank" rel="noopener">1800RESPECT — Legal services in South Australia</a> and <a href="https://1800respect.org.au/services/search?category=123&amp;state=sa" target="_blank" rel="noopener">Sexual Violence services in South Australia</a>. Service details can change; confirm directly with each provider.</p>
+        <p class="support-source">Additional information: <a href="https://voc.sa.gov.au/help-and-resources/support-services/sexual-assault-support-services" target="_blank" rel="noopener">Victims of Crime SA — Sexual assault support services</a>.</p>
       </section>
     </section>
 
@@ -1660,10 +1675,40 @@ window.FRENCH_TRANSLATIONS = {"- What time limit applies, how it is calculated, 
 })();
 </script>
 <script>
+Object.assign(window.FRENCH_TRANSLATIONS, {
+  "Support services": "Services de soutien",
+  "South Australian services from the 1800RESPECT directory. Open a category, then select a service to view its contact details.": "Services d’Australie-Méridionale répertoriés dans l’annuaire 1800RESPECT. Ouvrez une catégorie, puis sélectionnez un service pour afficher ses coordonnées.",
+  "Legal services": "Services juridiques",
+  "Legal service listings for South Australia. Confirm current availability and eligibility directly with each provider.": "Services juridiques répertoriés en Australie-Méridionale. Confirmez directement auprès de chaque organisme sa disponibilité et les critères d’admissibilité.",
+  "Sexual violence support services": "Services de soutien en cas de violence sexuelle",
+  "Sexual violence service listings for South Australia. Confirm current availability and suitability directly with each provider.": "Services en cas de violence sexuelle répertoriés en Australie-Méridionale. Confirmez directement auprès de chaque organisme sa disponibilité et son adéquation.",
+  "Website": "Site Web",
+  "Website:": "Site Web :",
+  "Email": "E-mail",
+  "Email:": "E-mail :",
+  "Phone:": "Téléphone :",
+  "No phone listed": "Aucun numéro de téléphone indiqué",
+  "Do not show this message again": "Ne plus afficher ce message",
+  "Could not read this preference. The help message will appear.": "Impossible de lire cette préférence. Le message d’aide s’affichera.",
+  "Could not save this preference. The help message will appear next time.": "Impossible d’enregistrer cette préférence. Le message d’aide s’affichera la prochaine fois.",
+  "and": "et",
+  "No website listed": "Aucun site Web indiqué",
+  "No email listed": "Aucune adresse e-mail indiquée",
+  "Source:": "Source :",
+  ". Service details can change; confirm directly with each provider.": ". Les détails du service peuvent changer ; confirmez directement auprès de chaque organisme.",
+  "Service details can change; confirm directly with each provider.": "Les détails du service peuvent changer ; confirmez directement auprès de chaque organisme.",
+  "Legal services in South Australia": "Services juridiques en Australie-Méridionale",
+  "1800RESPECT — Legal services in South Australia": "1800RESPECT — Services juridiques en Australie-Méridionale",
+  "Sexual Violence services in South Australia": "Services de soutien en cas de violence sexuelle en Australie-Méridionale",
+  "Additional information:": "Informations complémentaires :"
+});
+</script>
+<script>
 "use strict";
 
 // App configuration and the case-stage/reference data used by the screens.
 const STORAGE_KEY = "case-companion-data-v1";
+const HELP_DIALOG_SUPPRESSION_KEY = "case-tracker-hide-app-help-v1";
 const stages = [
   { title: "Reporting", meaning: "A report is made to police, who record information and may investigate.", next: "Police may make enquiries, keep you updated where possible, and refer the matter for a decision about charges.", documents: "Keep the police report or reference number, copies of anything you provide, and any written updates.", questions: "Who is my investigating officer? How do I get updates or tell police about a change in safety?" },
   { title: "Charges laid", meaning: "A prosecutor conducts the criminal case after a charge is laid. The court manages hearings and makes decisions.", next: "There may be preliminary hearings, preparation, a trial, a plea, or another outcome. The prosecutor can explain the expected path.", documents: "Keep charge, bail, subpoena, and court notices. Check the date, time, venue, and any instructions.", questions: "Who is my prosecutor contact? What support and arrangements are available for court?" },
@@ -2461,7 +2506,9 @@ function calculatorKey(key) {
     }
     if (isAppUnlockSequence) {
       document.getElementById("calculatorGate").close();
-      document.getElementById("appHelpDialog").showModal();
+      const hideHelp = readHelpDialogSuppression();
+      document.getElementById("hideAppHelp").checked = hideHelp;
+      if (!hideHelp) document.getElementById("appHelpDialog").showModal();
     }
   }
 }
@@ -3466,6 +3513,289 @@ document.getElementById("calculatorGate").showModal();
 window.setInterval(applyCalendarMinimums, 60000);
 checkTaskReminders();
 window.setInterval(checkTaskReminders, 60000);
+</script>
+<script>
+"use strict";
+
+const legalSupportDirectory = [
+  ["Family Court of Australia Mount Gambier", "https://www.fcfcoa.gov.au/", ""],
+  ["WIS Havens and Children's Centres: Mount Gambier", "https://officeforwomen.sa.gov.au/womens-information-service/outreach-centres", "mountgambierhaven@centacare.org.au"],
+  ["WIS Havens and Children's Centres: Murray Bridge", "https://officeforwomen.sa.gov.au/womens-information-service/outreach-centres", "haven@mbcci.org.au"],
+  ["WIS Havens and Children's Centres: Mount Barker", "https://officeforwomen.sa.gov.au/womens-information-service/outreach-centres", "haven@mtbcc.org.au"],
+  ["WIS Havens and Children's Centres: Gawler Community House", "https://officeforwomen.sa.gov.au/womens-information-service/outreach-centres", "haven@gawlercommunityhouse.org.au"],
+  ["WIS Havens and Children's Centres: Gawler Children's Centre", "https://officeforwomen.sa.gov.au/womens-information-service/outreach-centres", "ofw.gawler@sa.gov.au"],
+  ["WIS Havens and Children's Centres: Goolwa", "https://officeforwomen.sa.gov.au/womens-information-service/outreach-centres", "goolwahaven@alexandrina.sa.gov.au"],
+  ["Legal Services Commission SA: Elizabeth", "https://lsc.sa.gov.au/", "lsc.correspondence@lsc.sa.gov.au"],
+  ["Aboriginal Community Court: Elizabeth", "https://www.courts.sa.gov.au/going-to-court/court-locations/adelaide-magistrates-court/court-intervention-programs/aboriginal-community-courts/", "ajos@courts.sa.gov.au"],
+  ["Legal Services Commission SA: Health Justice Partnerships", "https://lsc.sa.gov.au/cb_pages/health_justice_partnerships.php", "fsis@lsc.sa.gov.au"],
+  ["Women's Legal Service SA (WLS)", "https://www.wlssa.org.au/", ""],
+  ["Relationships Australia SA: Together4kids", "https://www.rasa.org.au/support/services/together4kids/", ""],
+  ["Uniting Communities: Law Centre, Elder Abuse Unit", "https://www.unitingcommunities.org/service/legal-services/elder-abuse#programInformation", "elderabuseunit@unitingcommunities.org"],
+  ["Legal Services Commission SA: Adelaide", "https://lsc.sa.gov.au/", "lsc.correspondence@lsc.sa.gov.au"],
+  ["Legal Services Commission SA: Women's Domestic Violence Court Assistance", "https://lsc.sa.gov.au/cb_pages/wdvcas.php", "wdvcas@lsc.sa.gov.au"],
+  ["Family Court of Australia Adelaide", "https://www.fcfcoa.gov.au/", ""],
+  ["Victim Support Service SA", "https://www.victimsa.org/", ""],
+  ["Victims of Crime South Australia", "https://www.voc.sa.gov.au/", "victimsofcrime@sa.gov.au"],
+  ["Department for Correctional Services SA: Victims Support Unit", "https://www.corrections.sa.gov.au/victim-services", "dcsvictimservices@sa.gov.au"],
+  ["Police SA", "https://www.police.sa.gov.au/your-safety/domestic-violence", ""],
+  ["Life Without Barriers: Refugees & asylum seekers South Australia", "https://www.lwb.org.au/services/refugees-and-asylum-seekers/", "info@lwb.org.au"],
+  ["Police SA: Find Your Local Station", "https://www.police.sa.gov.au/about-us/find-your-local-police-station", ""],
+  ["Working Women's Centre SA", "https://wwcsa.org.au/", "reception@wwc.org.au"],
+  ["Aboriginal Community Court: Adelaide", "https://www.courts.sa.gov.au/going-to-court/court-locations/adelaide-magistrates-court/court-intervention-programs/aboriginal-community-courts/", "ajos@courts.sa.gov.au"],
+  ["Women's Information Service", "https://officeforwomen.sa.gov.au/womens-information-service/our-services", "ofwinformation@sa.gov.au"],
+  ["Women's Legal Service SA (WLS): Aboriginal & Torres Strait Islander Program", "https://www.wlssa.org.au/aboriginal-ts-islander-womens-progr", ""],
+  ["Aboriginal Legal Rights Movement", "https://www.alrm.org.au/legal-services/", ""],
+  ["Help A Sista Out", "https://www.alrm.org.au/help-a-sista-out/", ""],
+  ["Legal Services Commission SA: Domestic Violence Unit (DVU)", "https://lsc.sa.gov.au/cb_pages/domesticviolenceunit.php", "fsis@lsc.sa.gov.au"],
+  ["Legal Services Commission SA: Family Advocacy and Support Service (FASS)", "https://lsc.sa.gov.au/cb_pages/family_law_dls.php", "family.dutylawyer@lsc.sa.gov.au"],
+  ["SA Family Advocacy and Support Service", "https://familyviolencelaw.gov.au/fass/", "family.dutylawyer@lsc.sa.gov.au"],
+  ["knowmore: Financial Counselling", "https://knowmore.org.au/services/financial-counselling/", "info@knowmore.org.au"],
+  ["knowmore: Legal Advice and Assistance", "https://knowmore.org.au/services/legal-advice/", "info@knowmore.org.au"],
+  ["knowmore: Support Services", "https://knowmore.org.au/services/support-services/", "info@knowmore.org.au"],
+  ["knowmore: Territories Stolen Generations Redress Scheme", "https://knowmore.org.au/redress-schemes/territories-stolen-generations-redress", "info@knowmore.org.au"],
+  ["Ombudsman SA", "", ""],
+  ["The National Student Ombudsman", "www.nso.gov.au", ""],
+  ["Legal Services Commission SA: Health Justice Partnerships", "https://lsc.sa.gov.au/cb_pages/health_justice_partnerships.php", "fsis@lsc.sa.gov.au"],
+  ["Legal Services Commission SA: Noarlunga", "https://lsc.sa.gov.au/", "lsc.correspondence@lsc.sa.gov.au"],
+  ["The Yellow Gate", "https://theyellowgate.org.au/", "admin@theyellowgate.org.au"],
+  ["Legal Services Commission SA: Port Adelaide", "https://lsc.sa.gov.au/", "lsc.correspondence@lsc.sa.gov.au"],
+  ["WIS Havens and Children's Centres: Aldinga Beach", "https://officeforwomen.sa.gov.au/womens-information-service/outreach-centres", "ofw.aldinga@sa.gov.au"],
+  ["WIS Havens and Children's Centres: Port Pirie", "https://officeforwomen.sa.gov.au/womens-information-service/outreach-centres", "portpiriehaven@ucsa.org.au"],
+  ["Family Violence Legal Services Aboriginal Corporation: Port Augusta", "https://www.fvlsac.org.au/", "portaugusta@fvlsac.org.au"],
+  ["Legal Services Commission SA: Port Augusta", "https://lsc.sa.gov.au/", "lsc.correspondence@lsc.sa.gov.au"],
+  ["Legal Services Commission SA: Whyalla", "https://lsc.sa.gov.au/", "lsc.correspondence@lsc.sa.gov.au"],
+  ["WIS Havens and Children's Centres: Whyalla", "https://officeforwomen.sa.gov.au/womens-information-service/outreach-centres", "whyallahaven@cccsa.org.au"],
+  ["Family Violence Legal Services Aboriginal Corporation: Port Lincoln", "https://www.fvlsac.org.au/", "portlincoln@fvlsac.org.au"],
+  ["Family Violence Legal Services Aboriginal Corporation: Ceduna", "https://www.fvlsac.org.au/", "ceduna@fvlsac.org.au"],
+  ["Uniting SA", "https://unitingsa.com.au", ""],
+  ["Victims of Crime South Australia", "https://www.voc.sa.gov.au/", "victimsofcrime@sa.gov.au"]
+];
+
+const sexualViolenceSupportDirectory = [
+  ["Aboriginal Family Support Services: Berri", "https://www.afss.com.au/", "afss@afss.com.au"],
+  ["Aboriginal Family Support Services: Mount Gambier", "https://www.afss.com.au/", "afss@afss.com.au"],
+  ["Family Court of Australia Mount Gambier", "https://www.fcfcoa.gov.au/", ""],
+  ["WIS Havens and Children's Centres: Mount Gambier", "https://officeforwomen.sa.gov.au/womens-information-service/outreach-centres", "mountgambierhaven@centacare.org.au"],
+  ["Medicare Mental Health National Phone Service", "https://www.health.gov.au/our-work/medicare-mental-health-centres", ""],
+  ["Aboriginal Family Support Services: Murray Bridge", "https://www.afss.com.au/", "afss@afss.com.au"],
+  ["WIS Havens and Children's Centres: Murray Bridge", "https://officeforwomen.sa.gov.au/womens-information-service/outreach-centres", "haven@mbcci.org.au"],
+  ["WIS Havens and Children's Centres: Mount Barker", "https://officeforwomen.sa.gov.au/womens-information-service/outreach-centres", "haven@mtbcc.org.au"],
+  ["Medicare Mental Health National Phone Service", "https://www.health.gov.au/our-work/medicare-mental-health-centres", ""],
+  ["WIS Havens and Children's Centres: Gawler Community House", "https://officeforwomen.sa.gov.au/womens-information-service/outreach-centres", "haven@gawlercommunityhouse.org.au"],
+  ["WIS Havens and Children's Centres: Gawler Children's Centre", "https://officeforwomen.sa.gov.au/womens-information-service/outreach-centres", "ofw.gawler@sa.gov.au"],
+  ["WIS Havens and Children's Centres: Goolwa", "https://officeforwomen.sa.gov.au/womens-information-service/outreach-centres", "goolwahaven@alexandrina.sa.gov.au"],
+  ["Aboriginal Family Support Services: Smithfield", "https://www.afss.com.au/", "afss@afss.com.au"],
+  ["Anglicare SA: Settlement Engagement and Transition Support (SETS)", "https://anglicaresa.com.au/services/community/settlement-engagement-support/", "sets@anglicaresa.com.au"],
+  ["Medicare Mental Health National Phone Service", "https://www.health.gov.au/our-work/medicare-mental-health-centres", ""],
+  ["Relationships Australia SA: Elizabeth", "https://www.rasa.org.au", "salisburyfrc@rasa.org.au"],
+  ["Aboriginal Family Support Services: Salisbury", "https://www.afss.com.au/", "afss@afss.com.au"],
+  ["National Aged Care Advocacy Line", "https://www.sa.agedrights.asn.au/", "aras@agedrights.asn.au"],
+  ["Aboriginal Family Support Services: Paralowie", "https://www.afss.com.au/", "afss@afss.com.au"],
+  ["Women's Legal Service SA (WLS)", "https://www.wlssa.org.au/", ""],
+  ["Relationships Australia SA: Elm Place: Redress Support Service", "https://elmplace.org.au/our-services/", "elmplace@rasa.org.au"],
+  ["Relationships Australia SA: Together4kids", "https://www.rasa.org.au/support/services/together4kids/", ""],
+  ["Uniting Communities: Therapeutic Youth Services", "https://www.unitingcommunities.org/service/counselling/support-for-young-people", "counselling@unitingcommunities.org"],
+  ["Uniting Communities: Law Centre, Elder Abuse Unit", "https://www.unitingcommunities.org/service/legal-services/elder-abuse#programInformation", "elderabuseunit@unitingcommunities.org"],
+  ["SA Child Protection: Child Abuse Report Line (CARL)", "https://www.childprotection.sa.gov.au", ""],
+  ["Uniting Communities: Bfriend", "https://www.unitingcommunities.org/service/community-support/lgbtiqa-support", "bfriend@unitingcommunities.org"],
+  ["Disability Advocacy and Complaints Service of South Australia Inc", "https://www.dacssa.org.au/", "admin@dacssa.org.au"],
+  ["Family Court of Australia Adelaide", "https://www.fcfcoa.gov.au/", ""],
+  ["South Australia Police Gay and Lesbian Liaison Officers (GLLOs)", "https://www.police.sa.gov.au/services-and-events/community-programs/gay-and-lesbian-liaison-officers", ""],
+  ["Victim Support Service SA", "https://www.victimsa.org/", ""],
+  ["Victims of Crime South Australia", "https://www.voc.sa.gov.au/", "victimsofcrime@sa.gov.au"],
+  ["RentRight SA", "https://www.syc.net.au/services/housing-homelessness-support/rentright-sa", ""],
+  ["Department for Correctional Services SA: Victims Support Unit", "https://www.corrections.sa.gov.au/victim-services", "dcsvictimservices@sa.gov.au"],
+  ["Child and Family Health Service: Parent Helpline", "https://www.cafhs.sa.gov.au/services/parent-helpline", "healthwchncommunications@sa.gov.au"],
+  ["Police SA", "https://www.police.sa.gov.au/your-safety/domestic-violence", ""],
+  ["Aboriginal Family Support Services: Adelaide", "https://www.afss.com.au/", "afss@afss.com.au"],
+  ["Survivors of Torture and Trauma Assistance and Rehabilitation Service (STTARS)", "https://www.sttars.org.au/", "enquiries@sttars.org.au"],
+  ["Relationships Australia SA: rebuild: Counselling for Victims of Crime", "https://www.rasa.org.au/support/services/rebuild-counselling-for-victims-of-crime/", "rebuild@rasa.org.au"],
+  ["Relationships Australia SA: Childhood Sexual Abuse Counselling Service", "https://www.rasa.org.au/support/services/child-sexual-abuse-counselling-service/", "csacounselling@rasa.org.au"],
+  ["Western Adelaide Aboriginal Specific Homelessness Service (WAASHS)", "https://asg.org.au/homelessness/", ""],
+  ["Toward Home Homelessness Alliance: Lutheran Care", "https://www.lutherancare.org.au/toward-home-homelessness-alliance/", "stateoffice@lutherancare.org.au"],
+  ["Toward Home Homelessness Alliance: Lutheran Care", "https://www.lutherancare.org.au/toward-home-homelessness-alliance/", "stateoffice@lutherancare.org.au"],
+  ["Police SA: Find Your Local Station", "https://www.police.sa.gov.au/about-us/find-your-local-police-station", ""],
+  ["Salvation Army SA", "https://www.salvationarmy.org.au/", ""],
+  ["Owenia House", "https://sacommunity.org/org/202022-Owenia_House", "healthoweniahouse@sa.gov.au"],
+  ["Cedar Health Service", "https://www.wchn.sa.gov.au/our-network/cedar-health-service/", ""],
+  ["Safer Spaces", "https://www.victimsa.org/get-help/saferspaces", "enquiries@victimsa.org"],
+  ["Victim Support Service: National Redress Scheme", "https://www.victimsa.org/get-help/national-redress-scheme", "rss@victimsa.org"],
+  ["Victim Support Service: Court Companions", "https://www.victimsa.org/get-help/courtcompanions", ""],
+  ["Lutheran Care: Counselling", "https://www.lutherancare.org.au/financial-counselling/", "fars@lutherancare.org.au"],
+  ["Women's Information Service", "https://officeforwomen.sa.gov.au/womens-information-service/our-services", "ofwinformation@sa.gov.au"],
+  ["Catherine House-Crisis Accommodation", "https://catherinehouse.org.au/what-we-do/crisis-accommodation/", ""],
+  ["Medicare Mental Health National Phone Service", "https://www.health.gov.au/our-work/medicare-mental-health-centres", ""],
+  ["knowmore: Aboriginal and Torres Strait Islander Engagement", "https://knowmore.org.au/services/aboriginal-and-torres-strait-islander-support/", "info@knowmore.org.au"],
+  ["knowmore: Financial Counselling", "https://knowmore.org.au/services/financial-counselling/", "info@knowmore.org.au"],
+  ["knowmore: Legal Advice and Assistance", "https://knowmore.org.au/services/legal-advice/", "info@knowmore.org.au"],
+  ["knowmore: Support Services", "https://knowmore.org.au/services/support-services/", "info@knowmore.org.au"],
+  ["knowmore: Territories Stolen Generations Redress Scheme", "https://knowmore.org.au/redress-schemes/territories-stolen-generations-redress", "info@knowmore.org.au"],
+  ["Shine SA - With Respect Service", "https://shinesa.org.au/withrespect/", "info@shinesa.org.au"],
+  ["Equal Opportunity Commission - South Australia", "https://www.sa.gov.au/topics/about-sa/government/departments/equal-opportunity-commission", ""],
+  ["Yarrow Place Rape and Sexual Assault Service", "https://www.wchn.sa.gov.au/our-network/yarrow-place", "info@yarrowplace.sa.gov.au"],
+  ["Advocacy for Disability Access and Inclusion Inc", "https://www.advocacyfordisability.org.au/", ""],
+  ["St Vincent de Paul SA: Refugee & Asylum Seeker Help", "https://www.vinnies.org.au/sa/find-help/refugee-asylum-seeker-support", "eyengi@svdpsa.org.au"],
+  ["SA Health: Flinders Medical Centre (Child Safety & Wellbeing Health Service)", "https://www.sahealth.sa.gov.au/wps/wcm/connect/public+content/sa+health+internet/services/hospitals/flinders+medical+centre/services+and+clinics+at+flinders+medical+centre/services+at+flinders+medical+centre/child+safety+and+wellbeing+health+service+cswhs", ""],
+  ["Safe Pets Safe Families", "https://safepetssafefamilies.org.au/", "admin@safepetssafefamilies.org.au"],
+  ["Aboriginal Family Support Services: Cross Road", "https://www.afss.com.au/", "afss@afss.com.au"],
+  ["Shine SA - With Respect Service", "https://shinesa.org.au/withrespect/", "info@shinesa.org.au"],
+  ["Monash Health Community", "https://monashhealth.org/services/monash-health-community/", "icareaccess@monashhealth.org"],
+  ["Aboriginal Family Support Services: Morphett Vale", "https://www.afss.com.au/", "afss@afss.com.au"],
+  ["Southern Wellbeing Hub", "https://www.neaminational.org.au/find-services/southern-wellbeing-hub/", "southernwellbeinghub@neaminational.org.au"],
+  ["The Yellow Gate", "https://theyellowgate.org.au/", "admin@theyellowgate.org.au"],
+  ["Women's Health Service: Women's and Children's Health Network", "https://www.wchn.sa.gov.au/our-network/", ""],
+  ["WIS Havens and Children's Centres: Aldinga Beach", "https://officeforwomen.sa.gov.au/womens-information-service/outreach-centres", "ofw.aldinga@sa.gov.au"],
+  ["Adult Safeguarding Unit SA", "https://dhs.sa.gov.au/how-we-help/ageing-well/support-for-adult-safety-and-wellbeing/about-the-adult-safeguarding-unit", "adultsafeguardingunit@sa.gov.au"],
+  ["Aboriginal Family Support Services: Port Pirie", "https://www.afss.com.au/", "afss@afss.com.au"],
+  ["WIS Havens and Children's Centres: Port Pirie", "https://officeforwomen.sa.gov.au/womens-information-service/outreach-centres", "portpiriehaven@ucsa.org.au"],
+  ["Medicare Mental Health National Phone Service", "https://www.health.gov.au/our-work/medicare-mental-health-centres", ""],
+  ["Junction: Kangaroo Island Domestic Violence Service", "https://junctionaustralia.org.au/domestic-violence-services/", "fdvs@junctionaustralia.org.au"],
+  ["Family Violence Legal Services Aboriginal Corporation: Port Augusta", "https://www.fvlsac.org.au/", "portaugusta@fvlsac.org.au"],
+  ["Kornar Winmil Yunti (KWY) Aboriginal and Torres Strait Islander Family Services", "https://www.kwy.org.au/", "admin@kwy.org.au"],
+  ["Aboriginal Family Support Services: Port Augusta", "https://www.afss.com.au/", "afss@afss.com.au"],
+  ["Aboriginal Family Support Services: Whyalla", "https://www.afss.com.au/", "afss@afss.com.au"],
+  ["WIS Havens and Children's Centres: Whyalla", "https://officeforwomen.sa.gov.au/womens-information-service/outreach-centres", "whyallahaven@cccsa.org.au"],
+  ["Family Violence Legal Services Aboriginal Corporation: Port Lincoln", "https://www.fvlsac.org.au/", "portlincoln@fvlsac.org.au"],
+  ["Aboriginal Family Support Services: Port Lincoln", "https://www.afss.com.au/", "afss@afss.com.au"],
+  ["Family Violence Legal Services Aboriginal Corporation: Ceduna", "https://www.fvlsac.org.au/", "ceduna@fvlsac.org.au"],
+  ["Aboriginal Family Support Services: Ceduna", "https://www.afss.com.au/", "afss@afss.com.au"],
+  ["Wangka Wilurrara Accommodation Centre", "https://www.sa.gov.au/topics/housing/housing-for-aboriginal-people?external-uuid=d3cdf700-dbf9-419b-b64d-ecc74732ce7b", ""],
+  ["Aboriginal Family Support Services: Coober Pedy", "https://www.afss.com.au/", "afss@afss.com.au"],
+  ["Victims of Crime South Australia", "https://www.voc.sa.gov.au/", ""]
+];
+
+const legalSupportPhones = [
+  "1300 352 000", "0439 169 925", "0402 889 542", "0439 002 785", "0466 801 553",
+  "", "0499 407 237", "08 8111 5400", "", "(08) 8111 5511",
+  "1800 816 349", "1300 364 277", "1300 886 220", "1300 366 424", "1800 246 642",
+  "1300 352 000", "1800 842 864", "08 8204 9635", "(08) 8226 9000", "131 444",
+  "08 8193 9400", "131 444", "08 8410 6499", "", "08 8303 0590",
+  "08 8231 8929", "1800 643 222", "1800 643 222", "(08) 8111 5511", "08 8111 5300",
+  "08 8111 5300", "1800 605 762", "1800 605 762", "1800 605 762", "1800 566 966",
+  "(08) 7322 7020 or 1800 182 150", "1300 395 775", "(08) 8111 5511", "08 8111 5340", "1300 564 164",
+  "08 8111 5460", "0436 677 468", "0499 420 923", "1800 309 912", "08 8686 2200",
+  "08 8620 8500", "0407 251 696", "1800 309 912", "1800 309 912", "(08) 8440 2200",
+  "(08) 7322 7007"
+];
+
+const sexualViolenceSupportPhones = [
+  "08 8582 3192", "08 8723 6110", "1300 352 000", "0439 169 925", "1800 595 212",
+  "08 8532 1790", "0402 889 542", "0439 002 785", "1800 595 212", "0466 801 553",
+  "", "0499 407 237", "08 8254 1077", "08 8209 5400", "1800 595 212",
+  "(08) 8255 3323", "08 8182 6567", "1800 700 600", "08 8251 5440", "1800 816 349",
+  "1800 188 118", "1300 364 277", "1800 615 677", "1300 886 220", "13 14 78",
+  "08 8202 5190", "08 7122 6030", "1300 352 000", "", "1800 842 864",
+  "08 8204 9635", "1800 060 462", "(08) 8226 9000", "1300 364 100", "131 444",
+  "08 8205 1500", "08 8206 8900", "1800 310 310", "1800 408 408", "08 8243 1698",
+  "1800 809 273", "1800 809 273", "131 444", "08 8130 6188", "08 7425 6399",
+  "08 8444 0700", "1800 842 846", "1800 842 846", "1800 842 846", "08 8269 9300",
+  "08 8303 0590", "08 8232 2282", "1800 595 212", "1800 605 762", "1800 605 762",
+  "1800 605 762", "1800 605 762", "1800 566 966", "08 8300 5300", "1800 188 163",
+  "1800 817 421", "08 8340 4450", "08 8340 3053", "08 8204 5485", "0490 818 879",
+  "08 8297 5708", "08 8300 5300", "(03) 8572 5631", "08 8186 4000", "08 8326 3591",
+  "1300 564 164", "08 8444 0700", "0436 677 468", "1800 372 310", "08 8632 2227",
+  "0499 420 923", "1800 595 212", "08 8553 2877", "1800 309 912", "08 8377 7822",
+  "08 8641 0907", "08 8644 0116", "0407 251 696", "1800 309 912", "08 8683 1909",
+  "1800 309 912", "08 8625 3466", "08 8625 3522", "08 8672 3066", "(08) 7322 7007"
+];
+
+function readHelpDialogSuppression() {
+  try {
+    return localStorage.getItem(HELP_DIALOG_SUPPRESSION_KEY) === "true";
+  } catch (error) {
+    const status = document.getElementById("appHelpStorageStatus");
+    status.textContent = "Could not read this preference. The help message will appear.";
+    status.hidden = false;
+    return false;
+  }
+}
+
+function saveHelpDialogSuppression(suppressed) {
+  const checkbox = document.getElementById("hideAppHelp");
+  const status = document.getElementById("appHelpStorageStatus");
+  try {
+    if (suppressed) localStorage.setItem(HELP_DIALOG_SUPPRESSION_KEY, "true");
+    else localStorage.removeItem(HELP_DIALOG_SUPPRESSION_KEY);
+    status.textContent = "";
+    status.hidden = true;
+  } catch (error) {
+    checkbox.checked = false;
+    status.textContent = "Could not save this preference. The help message will appear next time.";
+    status.hidden = false;
+  }
+}
+
+function renderSupportDirectory(records, containerId) {
+  const container = document.getElementById(containerId);
+  const fragment = document.createDocumentFragment();
+  const phoneNumbers = containerId === "legalSupportServices" ? legalSupportPhones : sexualViolenceSupportPhones;
+  records.forEach(([name, website, email], index) => {
+    const entry = document.createElement("details");
+    entry.className = "support-service";
+    const summary = document.createElement("summary");
+    summary.textContent = name;
+    const content = document.createElement("div");
+    content.className = "support-service-content";
+    const phoneValue = phoneNumbers[index] || "";
+    const phoneLine = document.createElement("p");
+    const phoneLabel = document.createElement("strong");
+    phoneLabel.textContent = "Phone: ";
+    phoneLine.append(phoneLabel);
+    if (phoneValue) {
+      phoneValue.split(/\s+or\s+/i).forEach((phone, phoneIndex) => {
+        const formattedPhone = phone.replace(/\s{2,}/g, " ").trim();
+        const link = document.createElement("a");
+        link.href = `tel:${formattedPhone.replace(/[^\d+]/g, "")}`;
+        link.textContent = formattedPhone;
+        if (phoneIndex > 0) phoneLine.append(document.createTextNode(" · "));
+        phoneLine.append(link);
+      });
+    } else {
+      phoneLine.append(document.createTextNode("No phone listed"));
+    }
+    content.append(phoneLine);
+    if (website) {
+      const websiteLine = document.createElement("p");
+      const websiteLabel = document.createElement("strong");
+      websiteLabel.textContent = "Website: ";
+      const websiteLink = document.createElement("a");
+      const normalizedWebsite = /^https?:\/\//i.test(website) ? website : `https://${website}`;
+      websiteLink.href = normalizedWebsite;
+      websiteLink.target = "_blank";
+      websiteLink.rel = "noopener noreferrer";
+      websiteLink.textContent = website;
+      websiteLine.append(websiteLabel, websiteLink);
+      content.append(websiteLine);
+    } else {
+      const websiteMissing = document.createElement("p");
+      websiteMissing.textContent = "No website listed";
+      content.append(websiteMissing);
+    }
+    if (email) {
+      const emailLine = document.createElement("p");
+      const emailLabel = document.createElement("strong");
+      emailLabel.textContent = "Email: ";
+      const emailLink = document.createElement("a");
+      emailLink.href = `mailto:${email}`;
+      emailLink.textContent = email;
+      emailLine.append(emailLabel, emailLink);
+      content.append(emailLine);
+    } else {
+      const emailMissing = document.createElement("p");
+      emailMissing.textContent = "No email listed";
+      content.append(emailMissing);
+    }
+    entry.append(summary, content);
+    fragment.append(entry);
+  });
+  container.append(fragment);
+}
+
+renderSupportDirectory(legalSupportDirectory, "legalSupportServices");
+renderSupportDirectory(sexualViolenceSupportDirectory, "sexualViolenceSupportServices");
+document.getElementById("hideAppHelp").addEventListener("change", (event) => {
+  saveHelpDialogSuppression(event.currentTarget.checked);
+});
 </script>
 </body>
 </html>
