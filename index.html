@@ -1607,6 +1607,12 @@ window.FRENCH_TRANSLATIONS = {"- What time limit applies, how it is calculated, 
     "Listening for an English navigation command.": "Écoute d’une commande de navigation en anglais.",
     "Voice navigation stopped.": "Navigation vocale arrêtée.",
     "Microphone access was denied. Allow microphone access in your browser settings and try again.": "L’accès au microphone a été refusé. Autorisez l’accès au microphone dans les paramètres du navigateur, puis réessayez.",
+    "Requesting microphone access. Allow it in your browser to use voice navigation.": "Demande d’accès au microphone. Autorisez cet accès dans votre navigateur pour utiliser la navigation vocale.",
+    "Microphone access cannot be requested in this browser context. Open the app in a supported browser over a secure connection.": "L’accès au microphone ne peut pas être demandé dans ce contexte de navigateur. Ouvrez l’application dans un navigateur compatible via une connexion sécurisée.",
+    "Microphone access requires a secure browser connection. Open the app in a supported browser over HTTPS or localhost.": "L’accès au microphone nécessite une connexion sécurisée. Ouvrez l’application dans un navigateur compatible via HTTPS ou localhost.",
+    "No microphone was found. Connect a microphone and try again.": "Aucun microphone n’a été détecté. Connectez-en un, puis réessayez.",
+    "The microphone could not be opened. Check whether another app is using it, then try again.": "Le microphone n’a pas pu être activé. Vérifiez qu’aucune autre application ne l’utilise, puis réessayez.",
+    "Could not start voice navigation. Check your microphone and browser settings, then try again.": "La navigation vocale n’a pas pu démarrer. Vérifiez les paramètres du microphone et du navigateur, puis réessayez.",
     "Voice navigation is unavailable in this browser context. Try opening the app in a supported browser over a secure connection.": "La navigation vocale n’est pas disponible dans ce contexte de navigateur. Essayez d’ouvrir l’application dans un navigateur compatible via une connexion sécurisée.",
     "Voice navigation stopped because of a recognition error.": "La navigation vocale s’est arrêtée en raison d’une erreur de reconnaissance.",
     "Command not recognised. Try “open Dashboard” or “open Wellbeing hub”.": "Commande non reconnue. Essayez « open Dashboard » ou « open Wellbeing hub ».",
@@ -2414,18 +2420,34 @@ function navigateFromVoiceCommand(transcript) {
   showView(destination[0]);
   setVoiceNavigationStatus(destination[1]);
 }
-function startVoiceNavigation() {
+async function startVoiceNavigation() {
   if (!data.settings.voiceNavigation) {
     setVoiceNavigationStatus("Voice navigation is off. Enable it in Settings & accessibility.");
     return;
   }
-  if (voiceRecognition) return;
+  if (voiceRecognition || voiceRecognitionStarting) return;
   const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!Recognition) {
     setVoiceNavigationStatus("Voice navigation is not supported by this browser.");
     return;
   }
+  const getUserMedia = navigator.mediaDevices?.getUserMedia;
+  if (typeof getUserMedia !== "function") {
+    setVoiceNavigationStatus("Microphone access cannot be requested in this browser context. Open the app in a supported browser over a secure connection.");
+    return;
+  }
+  voiceRecognitionStarting = true;
+  setVoiceNavigationStatus("Requesting microphone access. Allow it in your browser to use voice navigation.");
+  let microphoneStream;
   try {
+    microphoneStream = await getUserMedia.call(navigator.mediaDevices, { audio: true });
+    microphoneStream.getTracks().forEach((track) => track.stop());
+    microphoneStream = null;
+    if (!data.settings.voiceNavigation) {
+      voiceRecognitionStarting = false;
+      setVoiceNavigationStatus("Voice navigation is off. Enable it in Settings & accessibility.");
+      return;
+    }
     const recognition = new Recognition();
     voiceRecognition = recognition;
     recognition.lang = "en-AU";
@@ -2459,7 +2481,7 @@ function startVoiceNavigation() {
       if (event.error === "not-allowed" || event.error === "service-not-allowed") {
         setVoiceNavigationStatus("Microphone access was denied. Allow microphone access in your browser settings and try again.");
       } else if (event.error === "audio-capture") {
-        setVoiceNavigationStatus("Voice navigation is unavailable in this browser context. Try opening the app in a supported browser over a secure connection.");
+        setVoiceNavigationStatus("The microphone could not be opened. Check whether another app is using it, then try again.");
       } else if (event.error !== "aborted") {
         setVoiceNavigationStatus("Voice navigation stopped because of a recognition error.");
       }
@@ -2477,15 +2499,23 @@ function startVoiceNavigation() {
         setVoiceNavigationStatus("Voice navigation stopped.");
       }
     };
-    voiceRecognitionStarting = true;
     recognition.start();
   } catch (error) {
+    microphoneStream?.getTracks().forEach((track) => track.stop());
     voiceRecognition = null;
     voiceRecognitionStarting = false;
     voiceRecognitionActive = false;
-    stopVoiceNavigation(error.name === "NotAllowedError" || error.name === "SecurityError"
-      ? "Voice navigation is unavailable in this browser context. Try opening the app in a supported browser over a secure connection."
-      : "Voice navigation stopped because of a recognition error.");
+    if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
+      stopVoiceNavigation("Microphone access was denied. Allow microphone access in your browser settings and try again.");
+    } else if (error.name === "SecurityError") {
+      stopVoiceNavigation("Microphone access requires a secure browser connection. Open the app in a supported browser over HTTPS or localhost.");
+    } else if (error.name === "NotFoundError" || error.name === "DevicesNotFoundError") {
+      stopVoiceNavigation("No microphone was found. Connect a microphone and try again.");
+    } else if (error.name === "NotReadableError" || error.name === "TrackStartError") {
+      stopVoiceNavigation("The microphone could not be opened. Check whether another app is using it, then try again.");
+    } else {
+      stopVoiceNavigation("Could not start voice navigation. Check your microphone and browser settings, then try again.");
+    }
   }
 }
 function readAloud(button) {
