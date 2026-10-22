@@ -83,6 +83,18 @@ a { text-decoration: none; color: #326276; }
 .help-dialog-option { display: flex; align-items: center; gap: 9px; margin-top: 15px; color: var(--ink); font-weight: 700; }
 .help-dialog-option input { width: 20px; min-height: 20px; margin: 0; accent-color: var(--forest-2); }
 .help-dialog-status { margin-top: 10px !important; color: #9a392c !important; font-size: 13px; }
+.speech-button { display: inline-flex; width: 32px; min-width: 32px; height: 32px; min-height: 32px; align-items: center; justify-content: center; margin: 0 0 0 6px; padding: 5px; border: 1px solid var(--line); border-radius: 50%; color: var(--forest); background: white; vertical-align: middle; }
+.speech-button:hover, .speech-button[aria-pressed="true"] { color: white; background: var(--forest-2); }
+.speech-button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.speech-status { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.voice-navigation-button[hidden] { display: none; }
+.voice-navigation-button[aria-pressed="true"] { color: white; background: var(--forest-2); }
+.voice-navigation-status { display: block; max-width: 1440px; margin: 0 auto; padding: 0 28px 10px; color: #e9f4ed; font-size: 13px; }
+.voice-navigation-status:empty { display: none; }
+.voice-navigation-setting { display: grid; grid-template-columns: 24px minmax(0,1fr); gap: 10px; align-items: start; margin-top: 15px; }
+.voice-navigation-setting input { width: 20px; min-height: 20px; margin: 2px 0 0; accent-color: var(--forest-2); }
+.voice-navigation-setting label { margin: 0; }
+.voice-navigation-note { margin: 8px 0 0 34px; color: var(--muted); font-size: 13px; }
 /* Full-screen calculator gate and app exit control. */
 .calculator-dialog { --calculator-bg: #000; --calculator-key: #303033; --calculator-function-key: #59595d; --calculator-orange: #ff9500; position: fixed; inset: 0; width: 100vw; max-width: none; height: 100vh; height: 100dvh; max-height: none; margin: 0; padding: max(14px, env(safe-area-inset-top)) max(15px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(15px, env(safe-area-inset-left)); border: 0; border-radius: 0; color: white; background: var(--calculator-bg); box-shadow: none; overflow: hidden; scrollbar-width: none; color-scheme: dark; }
 .calculator-dialog::-webkit-scrollbar { display: none; }
@@ -172,6 +184,8 @@ input::placeholder, textarea::placeholder { color: #87938e; }
 .dashboard-phase-list > details:first-of-type { border-top: 0; }
 .dashboard-phase-list > details > summary { padding: 14px 3px; color: var(--forest); cursor: pointer; font-weight: 800; }
 .quick-action-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 225px), 1fr)); gap: 9px; }
+.quick-action-item { display: flex; min-width: 0; align-items: center; gap: 6px; }
+.quick-action-item > .quick-action { flex: 1; }
 .quick-action { justify-content: flex-start; text-align: left; white-space: normal; }
 .justice-barrier { margin: 0 0 14px; padding: 14px 16px; border: 1px solid #e5bcb4; border-left: 5px solid var(--coral); border-radius: 6px; color: #71392f; background: var(--coral-soft); }
 .justice-barrier p:last-child { margin-bottom: 0; }
@@ -413,12 +427,15 @@ tr th { background-color: #f5f5f5; color: #34433e; }
     </div>
     <div class="header-actions">
       <a class="emergency-link" href="tel:000" aria-label="Emergency support: call 000"><span aria-hidden="true">!</span><span class="emergency-label">Emergency · 000</span><span class="availability-indicator availability-online" aria-label="Requires phone service">✓</span></a>
+      <button class="btn btn-light voice-navigation-button" id="voiceNavigationButton" type="button" aria-label="Start voice navigation" aria-pressed="false" aria-controls="voiceNavigationStatus" hidden><span class="icon" aria-hidden="true">🎙</span><span class="action-label">Voice navigation</span></button>
       <button class="btn btn-light" id="exportButton" type="button" title="Download a backup"><span class="icon" aria-hidden="true">↓</span><span class="action-label">Export backup</span></button>
       <button class="btn btn-light" id="importButton" type="button" title="Restore a backup"><span class="icon" aria-hidden="true">↑</span><span class="action-label">Import</span></button>
       <input class="file-input" id="importFile" type="file" accept="application/json,.json">
     </div>
   </div>
+  <p class="voice-navigation-status" id="voiceNavigationStatus" role="status" aria-live="polite"></p>
 </header>
+<p class="speech-status" id="speechStatus" role="status" aria-live="polite"></p>
 <!-- Workspace layout: desktop/mobile navigation and the app's content views. -->
 <div class="shell">
   <aside class="sidebar" aria-label="Main navigation">
@@ -955,8 +972,8 @@ tr th { background-color: #f5f5f5; color: #34433e; }
       <h1 class="page-heading">Wellbeing hub</h1>
       <p class="page-lede">Choose what feels useful. You can pause or leave any exercise at any time.</p>
       <div class="metrics"><div class="metric"><div class="metric-value" style="font-size:19px">You are not responsible for the offence.</div></div><div class="metric"><div class="metric-value" style="font-size:19px">You can ask questions at any stage.</div></div><div class="metric"><div class="metric-value" style="font-size:19px">Support is available throughout the process.</div></div><div class="metric"><div class="metric-value" style="font-size:19px">A not guilty verdict does not establish that a person was not believed.</div></div></div>
-      <section class="panel"><div class="panel-heading"><div><h2>Grounding exercise</h2><p>Take a moment to notice what is around you. Stop whenever you wish.</p></div></div><ol><li>Name five things you can see.</li><li>Notice four things you can feel beneath your hands or feet.</li><li>Listen for three sounds around you.</li><li>Notice two scents, or take two slow comfortable breaths.</li><li>Name one thing you need right now.</li></ol><button class="btn" id="groundingButton" type="button">Start a gentle 60-second pause</button><p id="groundingStatus" role="status" aria-live="polite"></p></section>
-      <section class="panel"><div class="panel-heading"><div><h2>Personal safety plan</h2><p>Only save details here if this device is safe for you to use.</p></div></div><label for="safetyPlan">People, places, or steps that may help me feel safer</label><textarea id="safetyPlan" rows="5"></textarea><div class="form-actions"><button class="btn btn-primary" id="saveSafetyButton" type="button">Save safety plan</button><span class="form-message" id="safetyMessage" role="status"></span></div></section>
+      <section class="panel"><div class="panel-heading"><div><h2>Grounding exercise</h2><p>Take a moment to notice what is around you. Stop whenever you wish. <button class="speech-button" type="button" data-speech-text="Take a moment to notice what is around you. Stop whenever you wish." aria-label="Read aloud in English" title="Read aloud in English"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"></path><path d="M15 9a5 5 0 0 1 0 6"></path><path d="M18 6a9 9 0 0 1 0 12"></path></svg></button></p></div></div><ol><li>Name five things you can see.</li><li>Notice four things you can feel beneath your hands or feet.</li><li>Listen for three sounds around you.</li><li>Notice two scents, or take two slow comfortable breaths.</li><li>Name one thing you need right now.</li></ol><button class="btn" id="groundingButton" type="button">Start a gentle 60-second pause</button><p id="groundingStatus" role="status" aria-live="polite"></p></section>
+      <section class="panel"><div class="panel-heading"><div><h2>Personal safety plan</h2><p>Only save details here if this device is safe for you to use. <button class="speech-button" type="button" data-speech-text="Only save details here if this device is safe for you to use." aria-label="Read aloud in English" title="Read aloud in English"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"></path><path d="M15 9a5 5 0 0 1 0 6"></path><path d="M18 6a9 9 0 0 1 0 12"></path></svg></button></p></div></div><label for="safetyPlan">People, places, or steps that may help me feel safer</label><textarea id="safetyPlan" rows="5"></textarea><div class="form-actions"><button class="btn btn-primary" id="saveSafetyButton" type="button">Save safety plan</button><span class="form-message" id="safetyMessage" role="status"></span></div></section>
       <section class="panel">
         <div class="panel-heading"><div><h2>Support services</h2><p>South Australian services from the 1800RESPECT directory. Open a category, then select a service to view its contact details.</p></div></div>
         <div class="notice danger-note"><strong>Immediate danger?</strong> Call <a href="tel:000">000</a>.</div>
@@ -981,6 +998,9 @@ tr th { background-color: #f5f5f5; color: #34433e; }
       <p class="page-lede">Choose accessibility options and calculator codes. Settings are stored on this device.</p>
       <section class="panel"><div class="panel-heading"><div><h2>Accessibility</h2></div></div>
         <div class="form-grid"><div class="field"><label for="fontSizeSetting">Text size</label><select id="fontSizeSetting"><option value="normal">Standard</option><option value="large">Large text</option></select></div><div class="field"><label for="contrastSetting">Colour contrast</label><select id="contrastSetting"><option value="standard">Standard</option><option value="high">High contrast</option></select></div><div class="field"><label for="plainSetting">Reading style</label><select id="plainSetting"><option value="standard">Standard English</option><option value="plain">Plain-English mode</option></select></div><div class="field"><label for="languageSetting">Preferred language</label><select id="languageSetting"><option value="en">English</option><option value="fr">French</option><option value="other">Other (translation link)</option></select><small id="languageSaveMessage" role="status" aria-live="polite"></small></div></div>
+        <div class="voice-navigation-setting"><input id="voiceNavigationSetting" type="checkbox"><label for="voiceNavigationSetting">Enable voice navigation (English commands only)</label></div>
+        <p class="voice-navigation-note">When enabled, your browser listens for navigation commands such as “open My Case Journey”. Microphone permission is required. Depending on your browser and device, audio may be sent to its speech-recognition service. Use navigation commands only; do not speak case details. Voice navigation is off until you turn it on here.</p>
+        <p class="voice-navigation-note">Available English commands: say one exact phrase — “open Dashboard”, “open My Case Journey”, “open Know My Rights”, “open My Memory Journal”, “open Court Information”, “open Questions and Notes”, “open Settings and accessibility”, or “open Wellbeing hub”.</p>
         <p><a href="https://www.courts.sa.gov.au/going-to-court/translation-services/" target="_blank" rel="noopener">South Australian Courts: translation services</a> · <a href="https://www.1800respect.org.au/accessibility" target="_blank" rel="noopener">1800RESPECT accessibility options</a></p>
       </section>
       <section class="panel">
@@ -1319,7 +1339,7 @@ window.FRENCH_TRANSLATIONS = {"- What time limit applies, how it is calculated, 
     "You might feel anxious, fearful, unsure what is expected, or concerned about seeing the accused.": "Vous pourriez être anxieux, avoir peur, ne pas savoir à quoi vous attendre ou craindre de voir la personne accusée.",
     "What are you most worried about?": "Qu’est-ce qui vous inquiète le plus ?",
     "What is cross-examination, and what if I cannot remember something?": "Qu’est-ce qu’un contre-interrogatoire et que faire si je ne me souviens pas de quelque chose ?",
-    "Cross-examination is a way the other side may ask questions of a witness in court. The process and rules depend on the case. You do not need to guess: listen carefully, answer truthfully, and say if you do not remember or do not understand. Ask your lawyer or witness-support contact what to expect in your case.": "Le contre-interrogatoire permet à l’autre partie de poser des questions à un témoin au tribunal. La procédure et les règles dépendent de l’affaire. Vous n’avez pas à deviner : écoutez attentivement, répondez honnêtement et dites-le si vous ne vous souvenez pas ou ne comprenez pas. Demandez à votre avocat ou à votre interlocuteur de soutien aux témoins à quoi vous attendre dans votre affaire.",
+    "Cross-examination is a way the other side may ask questions of a witness in court. The process and rules depend on the case. Listen carefully, answer truthfully, and say if you do not remember or do not understand. You do not need to guess. Ask your lawyer or witness-support contact what to expect in your case.": "Le contre-interrogatoire permet à l’autre partie de poser des questions à un témoin au tribunal. La procédure et les règles dépendent de l’affaire. Écoutez attentivement, répondez honnêtement et dites-le si vous ne vous souvenez pas ou ne comprenez pas. Vous n’avez pas à deviner. Demandez à votre avocat ou à votre interlocuteur de soutien aux témoins à quoi vous attendre dans votre affaire.",
     "Many people feel nervous about giving evidence. It is normal to have questions or concerns about attending court. Before the hearing, ask your lawyer or witness-support contact how to request a pause or raise a concern. What arrangements are available depends on the court and case.": "Beaucoup de personnes sont nerveuses à l’idée de témoigner. Il est normal d’avoir des questions ou des inquiétudes au sujet de sa présence au tribunal. Avant l’audience, demandez à votre avocat ou à votre interlocuteur de soutien aux témoins comment demander une pause ou signaler une préoccupation. Les aménagements possibles dépendent du tribunal et de l’affaire.",
     "Can I have support or accommodations at court?": "Puis-je bénéficier d’un accompagnement ou d’aménagements au tribunal ?",
     "Ask your witness-support contact or legal contact as early as possible about support people, accessibility needs, separate waiting arrangements, or other accommodations. Availability and approval depend on local arrangements and the court; do not assume a particular option is guaranteed.": "Renseignez-vous le plus tôt possible auprès de votre interlocuteur de soutien aux témoins ou de votre contact juridique sur la possibilité d’être accompagné, vos besoins d’accessibilité, une salle d’attente séparée ou d’autres aménagements. Leur disponibilité et leur approbation dépendent des dispositions locales et du tribunal ; aucune option particulière n’est garantie.",
@@ -1574,7 +1594,35 @@ window.FRENCH_TRANSLATIONS = {"- What time limit applies, how it is calculated, 
     "Am I eligible?": "Suis-je admissible ?",
     "Intervention Orders": "Ordonnances de protection (Intervention Orders)",
     "No messages recorded.": "Aucun message enregistré.",
-    "Call 000": "Appeler le 000"
+    "Call 000": "Appeler le 000",
+    "Enable voice navigation (English commands only)": "Activer la navigation vocale (commandes en anglais uniquement)",
+    "When enabled, your browser listens for navigation commands such as “open My Case Journey”. Microphone permission is required. Depending on your browser and device, audio may be sent to its speech-recognition service. Use navigation commands only; do not speak case details. Voice navigation is off until you turn it on here.": "Une fois activé, votre navigateur écoute les commandes de navigation telles que « open My Case Journey ». L’autorisation d’utiliser le microphone est nécessaire. Selon votre navigateur et votre appareil, l’audio peut être transmis à son service de reconnaissance vocale. Utilisez uniquement des commandes de navigation ; ne dictez aucun détail de votre dossier. La navigation vocale reste désactivée tant que vous ne l’activez pas ici.",
+    "Available English commands: say one exact phrase — “open Dashboard”, “open My Case Journey”, “open Know My Rights”, “open My Memory Journal”, “open Court Information”, “open Questions and Notes”, “open Settings and accessibility”, or “open Wellbeing hub”.": "Commandes vocales disponibles en anglais : dites exactement l’une des phrases suivantes — « open Dashboard », « open My Case Journey », « open Know My Rights », « open My Memory Journal », « open Court Information », « open Questions and Notes », « open Settings and accessibility » ou « open Wellbeing hub ».",
+    "Voice navigation": "Navigation vocale",
+    "Start voice navigation": "Démarrer la navigation vocale",
+    "Stop voice navigation": "Arrêter la navigation vocale",
+    "Read aloud in English": "Lire à voix haute en anglais",
+    "Voice navigation is off. Enable it in Settings & accessibility.": "La navigation vocale est désactivée. Activez-la dans Paramètres et accessibilité.",
+    "Voice navigation is not supported by this browser.": "Ce navigateur ne prend pas en charge la navigation vocale.",
+    "Listening for an English navigation command.": "Écoute d’une commande de navigation en anglais.",
+    "Voice navigation stopped.": "Navigation vocale arrêtée.",
+    "Microphone access was denied. Allow microphone access in your browser settings and try again.": "L’accès au microphone a été refusé. Autorisez l’accès au microphone dans les paramètres du navigateur, puis réessayez.",
+    "Voice navigation is unavailable in this browser context. Try opening the app in a supported browser over a secure connection.": "La navigation vocale n’est pas disponible dans ce contexte de navigateur. Essayez d’ouvrir l’application dans un navigateur compatible via une connexion sécurisée.",
+    "Voice navigation stopped because of a recognition error.": "La navigation vocale s’est arrêtée en raison d’une erreur de reconnaissance.",
+    "Command not recognised. Try “open Dashboard” or “open Wellbeing hub”.": "Commande non reconnue. Essayez « open Dashboard » ou « open Wellbeing hub ».",
+    "Reading aloud in English.": "Lecture à voix haute en anglais.",
+    "Reading aloud stopped.": "Lecture à voix haute arrêtée.",
+    "Opening Dashboard.": "Ouverture du tableau de bord.",
+    "Opening My Case Journey.": "Ouverture du parcours judiciaire.",
+    "Opening Know My Rights.": "Ouverture de la page Connaître mes droits.",
+    "Opening My Memory Journal.": "Ouverture de mon journal de souvenirs.",
+    "Opening Court Information.": "Ouverture des renseignements sur le tribunal.",
+    "Opening Questions and Notes.": "Ouverture des questions et notes.",
+    "Opening Settings and accessibility.": "Ouverture des paramètres et de l’accessibilité.",
+    "Opening Wellbeing hub.": "Ouverture de l’espace bien-être.",
+    "Speech synthesis is not supported by this browser.": "La synthèse vocale n’est pas prise en charge par ce navigateur.",
+    "Could not read this text aloud. Check your browser and device speech settings.": "Impossible de lire ce texte à voix haute. Vérifiez les paramètres vocaux de votre navigateur et de votre appareil.",
+    "Finished reading aloud.": "Lecture à voix haute terminée."
   });
   const translations = window.FRENCH_TRANSLATIONS;
   const originals = new WeakMap();
@@ -1889,7 +1937,7 @@ const courtFaqStages = [
     feelings: "You might feel anxious, fearful, unsure what is expected, or concerned about seeing the accused.",
     prompt: "What are you most worried about?",
     questions: [
-      { question: "What is cross-examination, and what if I cannot remember something?", answer: "Cross-examination is a way the other side may ask questions of a witness in court. The process and rules depend on the case. You do not need to guess: listen carefully, answer truthfully, and say if you do not remember or do not understand. Ask your lawyer or witness-support contact what to expect in your case.", options: [], links: [["Open your saved contacts", "contacts"], ["Read witness information", "court"]] },
+      { question: "What is cross-examination, and what if I cannot remember something?", answer: "Cross-examination is a way the other side may ask questions of a witness in court. The process and rules depend on the case. Listen carefully, answer truthfully, and say if you do not remember or do not understand. You do not need to guess. Ask your lawyer or witness-support contact what to expect in your case.", options: [], links: [["Open your saved contacts", "contacts"], ["Read witness information", "court"]] },
       { question: "What if I become upset while giving evidence?", answer: "Many people feel nervous about giving evidence. It is normal to have questions or concerns about attending court. Before the hearing, ask your lawyer or witness-support contact how to request a pause or raise a concern. What arrangements are available depends on the court and case.", options: [], links: [["Open your saved contacts", "contacts"], ["Open wellbeing support", "wellbeing"]] },
       { question: "Can I have support or accommodations at court?", answer: "Ask your witness-support contact or legal contact as early as possible about support people, accessibility needs, separate waiting arrangements, or other accommodations. Availability and approval depend on local arrangements and the court; do not assume a particular option is guaranteed.", options: [], links: [["Open your saved contacts", "contacts"], ["Read witness information", "court"]] },
       { question: "What should I expect on the day, and who will be there?", answer: "Who attends and what happens depends on the hearing. Confirm the time, venue, entry arrangements, waiting area, who you should contact, and whether you are required to attend with your legal or witness-support contact. Ask them about practical questions such as where to sit and what to wear.", options: [], links: [["Check saved court details", "overview"], ["Open your saved contacts", "contacts"], ["Read witness information", "court"]] },
@@ -2022,7 +2070,7 @@ const defaultData = () => ({
   compensation: { status: "Not started", reference: "", contact: "", deadline: "", payment: "", correspondence: "" },
   vocNavigator: { location: "", role: "", incidentDate: "", reportStatus: "", reportDate: "", evidence: [], impactNotes: "" },
   compensationChecklist: compensationItems.map(() => false), privateNotes: "", visDraft: ["", "", ""], safetyPlan: "",
-  settings: { fontSize: "normal", contrast: "standard", plain: "standard", language: "en", accessCode: "1234", distressCode: "999", sensitiveNotifications: "off", browserNotifications: false, memoryPrivacyWarningDismissed: false }
+  settings: { fontSize: "normal", contrast: "standard", plain: "standard", language: "en", accessCode: "1234", distressCode: "999", sensitiveNotifications: "off", browserNotifications: false, memoryPrivacyWarningDismissed: false, voiceNavigation: false }
 });
 function migrateTimeline(savedTimeline) {
   const oldTitles = {
@@ -2102,7 +2150,8 @@ function readStoredData() {
         distressCode: /^[1-9]\d{2,7}$/.test(String(saved.settings?.distressCode || "")) ? String(saved.settings.distressCode) : defaults.settings.distressCode,
         sensitiveNotifications: saved.settings?.sensitiveNotifications === "on" ? "on" : "off",
         browserNotifications: Boolean(saved.settings?.browserNotifications),
-        memoryPrivacyWarningDismissed: Boolean(saved.settings?.memoryPrivacyWarningDismissed)
+        memoryPrivacyWarningDismissed: Boolean(saved.settings?.memoryPrivacyWarningDismissed),
+        voiceNavigation: saved.settings?.voiceNavigation === true
       },
       latestUpdate: saved.latestUpdate || ""
     };
@@ -2173,6 +2222,336 @@ function migrateCourtDatesToTasks() {
 function escapeHTML(value) {
   return String(value ?? "").replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
 }
+function speechButtonMarkup(text) {
+  const speechText = (Array.isArray(text) ? text : [text]).filter(Boolean).join("\n");
+  return `<button class="speech-button" type="button" data-speech-text="${escapeHTML(speechText)}" aria-label="Read aloud in English" title="Read aloud in English"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"></path><path d="M15 9a5 5 0 0 1 0 6"></path><path d="M18 6a9 9 0 0 1 0 12"></path></svg></button>`;
+}
+function speechTextFrom(nodes) {
+  const elements = Array.isArray(nodes) ? nodes : [nodes];
+  return elements.map((element) => {
+    if (!element) return "";
+    const clone = element.cloneNode(true);
+    clone.querySelectorAll(".speech-button, button, .quick-action-grid, .court-faq-pathways, details, .source-warning, .phase-source-links").forEach((child) => child.remove());
+    clone.querySelectorAll("p").forEach((paragraph) => {
+      if (paragraph.textContent.replace(/\s+/g, " ").trim() === "Support is guided by your own goals and circumstances.") paragraph.remove();
+    });
+    const blocks = Array.from(clone.querySelectorAll("h2, h3, h4, p, li, .justice-barrier > strong"))
+      .filter((block) => !block.parentElement.closest("p, li"))
+      .map((block) => block.textContent.replace(/\s+/g, " ").trim());
+    const text = blocks.length ? blocks : [clone.textContent.replace(/\s+/g, " ").trim()];
+    return text.filter((part) => part && part !== "Support is guided by your own goals and circumstances.");
+  }).flat().filter(Boolean);
+}
+function addGroupedSpeechButton(question, answerNodes) {
+  if (!question || question.querySelector(".speech-button")) return;
+  const answer = speechTextFrom(answerNodes);
+  const prompt = question.textContent.replace(/\s+/g, " ").trim();
+  if (prompt && answer.length) question.insertAdjacentHTML("beforeend", ` ${speechButtonMarkup([prompt, ...answer])}`);
+}
+function addRightsSpeechButtons() {
+  const page = document.getElementById("view-rights");
+  if (!page) return;
+  page.querySelectorAll(".speech-button").forEach((button) => button.remove());
+  page.querySelectorAll("details.process-stage").forEach((details) => {
+    const answer = details.querySelector(":scope > .process-content");
+    addGroupedSpeechButton(details.querySelector(":scope > summary"), answer);
+  });
+  page.querySelectorAll(".panel").forEach((panel) => {
+    const heading = panel.querySelector(":scope > .panel-heading h2");
+    const headingBlock = heading?.closest(".panel-heading");
+    if (!heading || !headingBlock) return;
+    const answers = [headingBlock.querySelectorAll(":scope p")];
+    const following = [];
+    for (let sibling = headingBlock.nextElementSibling; sibling; sibling = sibling.nextElementSibling) {
+      if (sibling.matches("details, h2, h3, h4, section.process-block, .source-warning, .phase-source-links")) break;
+      following.push(sibling);
+    }
+    addGroupedSpeechButton(heading, [...answers[0], ...following]);
+  });
+  page.querySelectorAll(".process-block > h3, .process-block > h4").forEach((heading) => {
+    const answers = [];
+    for (let sibling = heading.nextElementSibling; sibling; sibling = sibling.nextElementSibling) {
+      if (sibling.matches("details, h2, h3, h4, .quick-action-grid, .source-warning, .phase-source-links")) break;
+      answers.push(sibling);
+    }
+    addGroupedSpeechButton(heading, answers);
+  });
+  const questionHeading = page.querySelector("#what-happened > .subheading");
+  if (questionHeading) {
+    const answers = [];
+    for (let sibling = questionHeading.nextElementSibling; sibling; sibling = sibling.nextElementSibling) {
+      if (sibling.matches("h2, h3, h4, details")) break;
+      answers.push(sibling);
+    }
+    addGroupedSpeechButton(questionHeading, answers);
+  }
+}
+function addPageSpeechButtons(selector) {
+  const page = document.querySelector(selector);
+  if (!page) return;
+  const excludedContent = ".court-faq-item, .memory-faq details, .court-faq-pathways, .message-log-list, .record-card, .contact-notes, .task-detail, [role='status'], [data-user-content]";
+  page.querySelectorAll("h1, h2, h3, summary, p, .notice").forEach((element) => {
+    if (element.closest(excludedContent)) return;
+    if (element.matches("p") && element.closest(".notice")) return;
+    if (element.querySelector(".speech-button")) return;
+    const text = element.textContent.replace(/\s+/g, " ").trim();
+    if (!text) return;
+    element.insertAdjacentHTML("beforeend", ` ${speechButtonMarkup(text)}`);
+  });
+  page.querySelectorAll("ul").forEach((list) => {
+    if (list.parentElement.closest("ul, .court-faq-item, .memory-faq details, .court-faq-pathways, .message-log-list, .record-card, [role='status'], [data-user-content]")) return;
+    if (list.querySelector(".speech-button")) return;
+    const text = Array.from(list.children)
+      .filter((item) => item.matches("li"))
+      .map((item) => item.textContent.replace(/\s+/g, " ").trim())
+      .filter(Boolean)
+      .join(". ");
+    if (text) list.insertAdjacentHTML("afterend", speechButtonMarkup(text));
+  });
+}
+function addCourtSpeechButtons() {
+  const page = document.getElementById("view-court");
+  if (!page) return;
+  page.querySelectorAll(".process-stage").forEach((details) => {
+    const summary = details.querySelector(":scope > summary");
+    const answer = details.querySelector(":scope > .process-content");
+    if (!summary || !answer) return;
+    details.querySelectorAll(".speech-button").forEach((button) => button.remove());
+    const speechAnswer = answer.cloneNode(true);
+    speechAnswer.querySelectorAll("a, button").forEach((element) => element.remove());
+    addGroupedSpeechButton(summary, speechAnswer);
+  });
+  page.querySelectorAll(".process-block > h3, .process-block > h4").forEach((heading) => {
+    const block = heading.closest(".process-block");
+    block.querySelectorAll(".speech-button").forEach((button) => button.remove());
+    const answer = [];
+    for (let sibling = heading.nextElementSibling; sibling; sibling = sibling.nextElementSibling) {
+      if (sibling.matches("h2, h3, h4, details, .quick-action-grid, .source-warning, .phase-source-links")) break;
+      const speechAnswer = sibling.cloneNode(true);
+      speechAnswer.querySelectorAll("a, button").forEach((element) => element.remove());
+      answer.push(speechAnswer);
+    }
+    addGroupedSpeechButton(heading, answer);
+  });
+}
+function addMemoryFaqSpeechButtons() {
+  document.querySelectorAll("#memory-support-faq details").forEach((details) => {
+    const answer = details.querySelector(".process-content");
+    const summary = details.querySelector("summary");
+    if (!answer || !summary || summary.querySelector(".speech-button")) return;
+    const question = summary.textContent.trim();
+    const response = speechTextFrom(answer);
+    if (question && response.length) summary.insertAdjacentHTML("beforeend", ` ${speechButtonMarkup([question, ...response])}`);
+  });
+}
+function addDashboardSpeechButtons() {
+  ["#view-overview .support-warning", "#dashboardQuickActionsTitle"].forEach((selector) => {
+    const element = document.querySelector(selector);
+    if (!element || element.querySelector(".speech-button")) return;
+    const text = element.textContent.replace(/\s+/g, " ").trim();
+    if (text) element.insertAdjacentHTML("beforeend", ` ${speechButtonMarkup(text)}`);
+  });
+}
+let activeSpeechButton = null;
+let activeSpeechUtterance = null;
+let activeSpeechTimer = null;
+let voiceRecognition = null;
+let voiceRecognitionActive = false;
+let voiceRecognitionStarting = false;
+function setVoiceNavigationStatus(message) {
+  document.getElementById("voiceNavigationStatus").textContent = message;
+}
+function stopVoiceNavigation(message = "") {
+  if (voiceRecognition && (voiceRecognitionActive || voiceRecognitionStarting)) {
+    try {
+      voiceRecognition.stop();
+    } catch (error) {
+      if (error.name !== "InvalidStateError") throw error;
+      voiceRecognition = null;
+      voiceRecognitionActive = false;
+      voiceRecognitionStarting = false;
+    }
+  }
+  voiceRecognitionActive = false;
+  voiceRecognitionStarting = false;
+  const button = document.getElementById("voiceNavigationButton");
+  button.setAttribute("aria-pressed", "false");
+  button.setAttribute("aria-label", "Start voice navigation");
+  button.querySelector(".action-label").textContent = "Voice navigation";
+  if (message) setVoiceNavigationStatus(message);
+}
+function updateVoiceNavigationVisibility() {
+  const enabled = data.settings.voiceNavigation === true;
+  const button = document.getElementById("voiceNavigationButton");
+  button.hidden = !enabled;
+  if (!enabled) {
+    stopVoiceNavigation();
+    setVoiceNavigationStatus("");
+  }
+}
+window.updateVoiceNavigationVisibility = updateVoiceNavigationVisibility;
+function navigateFromVoiceCommand(transcript) {
+  const command = transcript.toLocaleLowerCase("en-AU").replace(/[.!?,;:]+$/g, "").trim();
+  const destinations = new Map([
+    ["open dashboard", ["overview", "Opening Dashboard."]],
+    ["go to dashboard", ["overview", "Opening Dashboard."]],
+    ["open my case journey", ["timeline", "Opening My Case Journey."]],
+    ["open case journey", ["timeline", "Opening My Case Journey."]],
+    ["open know my rights", ["rights", "Opening Know My Rights."]],
+    ["open my memory journal", ["memory", "Opening My Memory Journal."]],
+    ["open memory journal", ["memory", "Opening My Memory Journal."]],
+    ["open court information", ["court", "Opening Court Information."]],
+    ["open questions and notes", ["notes", "Opening Questions and Notes."]],
+    ["open settings and accessibility", ["settings", "Opening Settings and accessibility."]],
+    ["open wellbeing hub", ["wellbeing", "Opening Wellbeing hub."]],
+    ["open the wellbeing hub", ["wellbeing", "Opening Wellbeing hub."]]
+  ]);
+  const destination = destinations.get(command);
+  if (!destination) {
+    setVoiceNavigationStatus("Command not recognised. Try “open Dashboard” or “open Wellbeing hub”.");
+    return;
+  }
+  showView(destination[0]);
+  setVoiceNavigationStatus(destination[1]);
+}
+function startVoiceNavigation() {
+  if (!data.settings.voiceNavigation) {
+    setVoiceNavigationStatus("Voice navigation is off. Enable it in Settings & accessibility.");
+    return;
+  }
+  if (voiceRecognition) return;
+  const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!Recognition) {
+    setVoiceNavigationStatus("Voice navigation is not supported by this browser.");
+    return;
+  }
+  try {
+    const recognition = new Recognition();
+    voiceRecognition = recognition;
+    recognition.lang = "en-AU";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.onstart = () => {
+      if (voiceRecognition !== recognition || !data.settings.voiceNavigation) {
+        try {
+          recognition.stop();
+        } catch (error) {
+          if (error.name !== "InvalidStateError") throw error;
+        }
+        return;
+      }
+      voiceRecognitionStarting = false;
+      voiceRecognitionActive = true;
+      const button = document.getElementById("voiceNavigationButton");
+      button.setAttribute("aria-pressed", "true");
+      button.setAttribute("aria-label", "Stop voice navigation");
+      button.querySelector(".action-label").textContent = "Stop voice navigation";
+      setVoiceNavigationStatus("Listening for an English navigation command.");
+    };
+    recognition.onresult = (event) => {
+      if (voiceRecognition !== recognition) return;
+      const transcript = event.results?.[event.resultIndex]?.[0]?.transcript;
+      if (typeof transcript === "string") navigateFromVoiceCommand(transcript);
+      else setVoiceNavigationStatus("Command not recognised. Try “open Dashboard” or “open Wellbeing hub”.");
+    };
+    recognition.onerror = (event) => {
+      if (voiceRecognition !== recognition) return;
+      if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+        setVoiceNavigationStatus("Microphone access was denied. Allow microphone access in your browser settings and try again.");
+      } else if (event.error === "audio-capture") {
+        setVoiceNavigationStatus("Voice navigation is unavailable in this browser context. Try opening the app in a supported browser over a secure connection.");
+      } else if (event.error !== "aborted") {
+        setVoiceNavigationStatus("Voice navigation stopped because of a recognition error.");
+      }
+    };
+    recognition.onend = () => {
+      if (voiceRecognition !== recognition) return;
+      voiceRecognitionActive = false;
+      voiceRecognitionStarting = false;
+      voiceRecognition = null;
+      const button = document.getElementById("voiceNavigationButton");
+      button.setAttribute("aria-pressed", "false");
+      button.setAttribute("aria-label", "Start voice navigation");
+      button.querySelector(".action-label").textContent = "Voice navigation";
+      if (document.getElementById("voiceNavigationStatus").textContent === "Listening for an English navigation command.") {
+        setVoiceNavigationStatus("Voice navigation stopped.");
+      }
+    };
+    voiceRecognitionStarting = true;
+    recognition.start();
+  } catch (error) {
+    voiceRecognition = null;
+    voiceRecognitionStarting = false;
+    voiceRecognitionActive = false;
+    stopVoiceNavigation(error.name === "NotAllowedError" || error.name === "SecurityError"
+      ? "Voice navigation is unavailable in this browser context. Try opening the app in a supported browser over a secure connection."
+      : "Voice navigation stopped because of a recognition error.");
+  }
+}
+function readAloud(button) {
+  if (!("speechSynthesis" in window) || typeof window.SpeechSynthesisUtterance !== "function") {
+    document.getElementById("speechStatus").textContent = "Speech synthesis is not supported by this browser.";
+    return;
+  }
+  if (activeSpeechButton === button) {
+    if (activeSpeechTimer !== null) window.clearTimeout(activeSpeechTimer);
+    activeSpeechTimer = null;
+    window.speechSynthesis.cancel();
+    button.setAttribute("aria-pressed", "false");
+    activeSpeechButton = null;
+    activeSpeechUtterance = null;
+    document.getElementById("speechStatus").textContent = "Reading aloud stopped.";
+    return;
+  }
+  if (activeSpeechTimer !== null) window.clearTimeout(activeSpeechTimer);
+  activeSpeechTimer = null;
+  window.speechSynthesis.cancel();
+  activeSpeechButton?.setAttribute("aria-pressed", "false");
+  activeSpeechButton = button;
+  button.setAttribute("aria-pressed", "true");
+  const speechParts = (button.dataset.speechText || "").split(/\n+/).map((part) => part.replace(/\bSA\b/g, "ess-ay").replace(/\b000\b/g, "triple zero").trim()).filter(Boolean);
+  let partIndex = 0;
+  const finishSpeech = () => {
+    if (activeSpeechButton !== button) return;
+    button.setAttribute("aria-pressed", "false");
+    activeSpeechButton = null;
+    activeSpeechUtterance = null;
+    activeSpeechTimer = null;
+    document.getElementById("speechStatus").textContent = "Finished reading aloud.";
+  };
+  const speakNextPart = () => {
+    if (activeSpeechButton !== button) return;
+    if (partIndex >= speechParts.length) {
+      finishSpeech();
+      return;
+    }
+    const utterance = new SpeechSynthesisUtterance(speechParts[partIndex]);
+    utterance.lang = "en-AU";
+    activeSpeechUtterance = utterance;
+    utterance.onend = () => {
+      if (activeSpeechUtterance !== utterance) return;
+      activeSpeechUtterance = null;
+      partIndex += 1;
+      if (partIndex >= speechParts.length) finishSpeech();
+      else activeSpeechTimer = window.setTimeout(() => {
+        activeSpeechTimer = null;
+        speakNextPart();
+      }, 400);
+    };
+    utterance.onerror = () => {
+      if (activeSpeechUtterance !== utterance) return;
+      if (activeSpeechTimer !== null) window.clearTimeout(activeSpeechTimer);
+      activeSpeechTimer = null;
+      button.setAttribute("aria-pressed", "false");
+      activeSpeechButton = null;
+      activeSpeechUtterance = null;
+      document.getElementById("speechStatus").textContent = "Could not read this text aloud. Check your browser and device speech settings.";
+    };
+    window.speechSynthesis.speak(utterance);
+  };
+  document.getElementById("speechStatus").textContent = "Reading aloud in English.";
+  speakNextPart();
+}
 function makeId() {
   return globalThis.crypto && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
@@ -2211,6 +2590,15 @@ function makeActionButton(label, className = "") {
   return `<button class="btn ${className}" type="button" data-view-target="${escapeHTML(view)}"${scrollTarget}>${escapeHTML(label)}</button>`;
 }
 function showView(view) {
+  if (activeView !== view && activeSpeechButton) {
+    if (activeSpeechTimer !== null) window.clearTimeout(activeSpeechTimer);
+    activeSpeechTimer = null;
+    window.speechSynthesis.cancel();
+    activeSpeechButton?.setAttribute("aria-pressed", "false");
+    activeSpeechButton = null;
+    activeSpeechUtterance = null;
+    document.getElementById("speechStatus").textContent = "Reading aloud stopped.";
+  }
   activeView = view;
   document.querySelectorAll(".view").forEach((section) => section.classList.toggle("active", section.dataset.view === view));
   document.querySelectorAll("[data-view-target]").forEach((button) => button.setAttribute("aria-current", button.dataset.viewTarget === view ? "page" : "false"));
@@ -2530,7 +2918,7 @@ function renderDashboardPhaseGuidance() {
     <details class="dashboard-phase-item">
       <summary>${escapeHTML(phase.title)}</summary>
       <div class="phase-guidance">
-        <dl>${phase.answers.map(([question, answer]) => `<dt>${escapeHTML(question)}</dt><dd>${escapeHTML(answer)}</dd>`).join("")}</dl>
+        <dl>${phase.answers.map(([question, answer]) => `<dt>${escapeHTML(question)}</dt><dd>${escapeHTML(answer)} ${speechButtonMarkup(answer)}</dd>`).join("")}</dl>
         <p class="phase-source-links">Sources: ${references.map(([label, url]) => `<a href="${url}" target="_blank" rel="noopener">${escapeHTML(label)}</a>`).join(" · ")}</p>
       </div>
     </details>`).join("");
@@ -2550,7 +2938,8 @@ function renderOverview() {
     ["Contacts saved", String(data.contacts.length)],
     ["Documents logged", String(data.documents.length)]
   ].map(([label, value]) => `<div class="metric"><div class="metric-label">${label}</div><div class="metric-value">${escapeHTML(value)}</div></div>`).join("");
-  document.getElementById("dashboardQuickActions").innerHTML = dashboardActionLabels.map((label) => makeActionButton(label, "quick-action")).join("");
+  document.getElementById("dashboardQuickActions").innerHTML = dashboardActionLabels.map((label) => `<div class="quick-action-item">${makeActionButton(label, "quick-action")}${speechButtonMarkup(label)}</div>`).join("");
+  addDashboardSpeechButtons();
   document.getElementById("addDashboardCourtDate").disabled = !data.case.nextCourtDate;
   const courtDetails = courtDetailsFromVenue(data.case);
   const summaries = [
@@ -2587,7 +2976,7 @@ function renderTimeline() {
     const complete = Boolean(stage.done);
     const marker = complete ? `<span class="journey-stage-marker complete" aria-label="Completed">✓</span>` : active ? `<span class="journey-stage-marker" aria-hidden="true"></span>` : `<span class="journey-stage-marker" aria-label="Not completed">○</span>`;
     const actions = journeyActions[stage.title] || [];
-    const quickReferences = `<details class="journey-stage-details"${active ? " open" : ""}><summary class="timeline-title">Quick references</summary><div class="process-grid" style="margin-top:8px"><div class="process-block"><h4>What it means</h4><p>${escapeHTML(help.meaning)}</p></div><div class="process-block"><h4>What may happen next</h4><p>${escapeHTML(help.next)}</p></div><div class="process-block"><h4>Documents</h4><p>${escapeHTML(help.documents)}</p></div><div class="process-block"><h4>Questions to discuss</h4><p>${escapeHTML(help.questions)}</p></div></div><section class="journey-actions"><h3>What can I do now?</h3><h4>Actions you can take</h4><div class="quick-action-grid">${actions.map((label) => makeActionButton(label, "btn-small")).join("")}</div></section><details class="journey-stage-details"><summary>More phase information</summary><dl class="phase-guidance" style="margin-top:12px">${phase.answers.map(([question, answer]) => `<dt>${escapeHTML(question)}</dt><dd>${escapeHTML(answer)}</dd>`).join("")}</dl></details></details>`;
+    const quickReferences = `<details class="journey-stage-details"${active ? " open" : ""}><summary class="timeline-title">Quick references</summary><div class="process-grid" style="margin-top:8px"><div class="process-block"><h4>What it means</h4><p>${escapeHTML(help.meaning)} ${speechButtonMarkup(help.meaning)}</p></div><div class="process-block"><h4>What may happen next</h4><p>${escapeHTML(help.next)} ${speechButtonMarkup(help.next)}</p></div><div class="process-block"><h4>Documents</h4><p>${escapeHTML(help.documents)} ${speechButtonMarkup(help.documents)}</p></div><div class="process-block"><h4>Questions to discuss</h4><p>${escapeHTML(help.questions)} ${speechButtonMarkup(help.questions)}</p></div></div><section class="journey-actions"><h3>What can I do now?</h3><h4>Actions you can take</h4><div class="quick-action-grid">${actions.map((label) => makeActionButton(label, "btn-small")).join("")}</div></section><details class="journey-stage-details"><summary>More phase information</summary><dl class="phase-guidance" style="margin-top:12px">${phase.answers.map(([question, answer]) => `<dt>${escapeHTML(question)}</dt><dd>${escapeHTML(answer)} ${speechButtonMarkup(answer)}</dd>`).join("")}</dl></details></details>`;
     return `<div class="journey-stage"><div class="journey-stage-heading">${marker}<div style="min-width:0;flex:1"><label class="journey-stage-choice"><input type="checkbox" data-journey-stage="${index}" aria-label="Mark ${escapeHTML(stage.title)} complete" ${complete ? "checked disabled" : active ? journeyStageSelected ? "checked" : "" : "disabled"}>${escapeHTML(stage.title)}</label></div></div>${quickReferences}<div class="journey-stage-meta">${complete ? `Completed${stage.date ? ` · ${escapeHTML(formatDate(stage.date))}` : ""}` : active ? "Current phase — save when complete" : "Not yet opened"}</div></div>`;
   }).join("");
   document.getElementById("saveJourneyButton").disabled = activeIndex < 0 || pendingJourneyStageIndex !== activeIndex || !journeyStageSelected;
@@ -2644,10 +3033,10 @@ function renderTasks() {
 }
 function renderProcessGuide() {
   document.getElementById("processGuide").innerHTML = processStages.map((stage, index) => `<details class="process-stage" ${index === 0 ? "open" : ""}><summary>${escapeHTML(stage.name)}</summary><div class="process-content"><div class="process-grid">
-    <div class="process-block"><h4>Who is involved</h4><p>${escapeHTML(stage.involved)}</p></div>
-    <div class="process-block"><h4>What happens next</h4><p>${escapeHTML(stage.next)}</p></div>
-    <div class="process-block"><h4>Expected timeframe</h4><p>${escapeHTML(stage.timeframe)}</p></div>
-    <div class="process-block"><h4>Support available</h4><p>${escapeHTML(stage.support)}</p></div>
+    <div class="process-block"><h4>Who is involved</h4><p>${escapeHTML(stage.involved)} ${speechButtonMarkup(stage.involved)}</p></div>
+    <div class="process-block"><h4>What happens next</h4><p>${escapeHTML(stage.next)} ${speechButtonMarkup(stage.next)}</p></div>
+    <div class="process-block"><h4>Expected timeframe</h4><p>${escapeHTML(stage.timeframe)} ${speechButtonMarkup(stage.timeframe)}</p></div>
+    <div class="process-block"><h4>Support available</h4><p>${escapeHTML(stage.support)} ${speechButtonMarkup(stage.support)}</p></div>
   </div></div></details>`).join("");
 }
 function filterCourtFaq() {
@@ -2684,11 +3073,13 @@ function renderCourtFaq() {
         return `<a ${destination}>${escapeHTML(label)}</a>`;
       }).join("");
       return `<details class="court-faq-item" data-faq-question data-faq-stage="${stageIndex}" data-search="${escapeHTML(searchText)}">
-        <summary>${escapeHTML(item.question)}</summary>
+        <summary>${escapeHTML(item.question)} ${speechButtonMarkup([item.question, item.answer])}</summary>
         <div class="court-faq-answer"><p>${escapeHTML(item.answer)}</p>${options}<div class="court-faq-pathways"><strong>Possible next steps:</strong>${links}</div></div>
       </details>`;
     }).join("")}
   </section>`).join("")}<p class="court-faq-empty" id="courtFaqEmpty" hidden>No questions match your search. Try another word or choose “All stages”.</p>`;
+  addPageSpeechButtons("#view-court");
+  addCourtSpeechButtons();
   filterCourtFaq();
 }
 function renderCommunications() {
@@ -2845,6 +3236,8 @@ function applySettings() {
   document.getElementById("fontSizeSetting").value = data.settings.fontSize;
   document.getElementById("contrastSetting").value = data.settings.contrast;
   document.getElementById("plainSetting").value = data.settings.plain;
+  document.getElementById("voiceNavigationSetting").checked = Boolean(data.settings.voiceNavigation);
+  if (typeof window.updateVoiceNavigationVisibility === "function") window.updateVoiceNavigationVisibility();
   const languageSetting = document.getElementById("languageSetting");
   languageSetting.value = data.settings.language;
   if (typeof window.applyPreferredLanguage === "function") window.applyPreferredLanguage(data.settings.language);
@@ -3036,7 +3429,8 @@ async function restoreBackup(file) {
         distressCode: /^[1-9]\d{2,7}$/.test(String(candidate.settings?.distressCode || "")) ? String(candidate.settings.distressCode) : defaults.settings.distressCode,
         sensitiveNotifications: candidate.settings?.sensitiveNotifications === "on" ? "on" : "off",
         browserNotifications: Boolean(candidate.settings?.browserNotifications),
-        memoryPrivacyWarningDismissed: Boolean(candidate.settings?.memoryPrivacyWarningDismissed)
+        memoryPrivacyWarningDismissed: Boolean(candidate.settings?.memoryPrivacyWarningDismissed),
+        voiceNavigation: candidate.settings?.voiceNavigation === true
       }
     };
     data.keySupportPersonId = typeof candidate.keySupportPersonId === "string" ? candidate.keySupportPersonId : "";
@@ -3225,6 +3619,13 @@ document.getElementById("taskForm").addEventListener("submit", (event) => {
   document.getElementById("taskMessage").textContent = id ? "Task updated." : "Task added.";
 });
 document.addEventListener("click", (event) => {
+  const speechButton = event.target.closest("[data-speech-text]");
+  if (speechButton) {
+    event.preventDefault();
+    event.stopPropagation();
+    readAloud(speechButton);
+    return;
+  }
   const nav = event.target.closest("[data-view-target]");
   if (nav) {
     event.preventDefault();
@@ -3236,6 +3637,10 @@ document.addEventListener("click", (event) => {
       destination?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   }
+});
+document.getElementById("voiceNavigationButton").addEventListener("click", () => {
+  if (voiceRecognitionActive) stopVoiceNavigation("Voice navigation stopped.");
+  else startVoiceNavigation();
 });
 document.getElementById("addDashboardCourtDate").addEventListener("click", () => {
   if (!data.case.nextCourtDate) {
@@ -3440,7 +3845,7 @@ document.getElementById("saveSettingsButton").addEventListener("click", () => {
     return;
   }
   const previousLanguage = data.settings.language;
-  data.settings = { ...data.settings, fontSize: document.getElementById("fontSizeSetting").value, contrast: document.getElementById("contrastSetting").value, plain: document.getElementById("plainSetting").value, language: document.getElementById("languageSetting").value, accessCode: accessCode.value, distressCode: distressCode.value };
+  data.settings = { ...data.settings, fontSize: document.getElementById("fontSizeSetting").value, contrast: document.getElementById("contrastSetting").value, plain: document.getElementById("plainSetting").value, language: document.getElementById("languageSetting").value, accessCode: accessCode.value, distressCode: distressCode.value, voiceNavigation: document.getElementById("voiceNavigationSetting").checked };
   const saved = persist();
   if (previousLanguage !== data.settings.language) {
     renderOverview(); renderDocuments(); renderTasks(); renderCommunications(); renderMemories(); refreshTimelineStatusDates(); applyCalendarMinimums();
@@ -3507,6 +3912,10 @@ renderProcessGuide();
 renderCourtFaq();
 renderDashboardPhaseGuidance();
 renderCalculatorHistory();
+addRightsSpeechButtons();
+addPageSpeechButtons("#view-memory");
+addMemoryFaqSpeechButtons();
+addDashboardSpeechButtons();
 renderAll();
 document.body.classList.add("calculator-active");
 document.getElementById("calculatorGate").showModal();
