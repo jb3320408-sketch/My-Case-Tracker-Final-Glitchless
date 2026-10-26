@@ -83,6 +83,12 @@ a { text-decoration: none; color: #326276; }
 .help-dialog-option { display: flex; align-items: center; gap: 9px; margin-top: 15px; color: var(--ink); font-weight: 700; }
 .help-dialog-option input { width: 20px; min-height: 20px; margin: 0; accent-color: var(--forest-2); }
 .help-dialog-status { margin-top: 10px !important; color: #9a392c !important; font-size: 13px; }
+.delete-data-dialog p + p { margin-top: 12px; }
+.case-update-reminder { margin-top: 14px; }
+.case-update-reminder h3 { margin-top: 0; }
+.case-update-reminder-toggle { display: flex; align-items: flex-start; gap: 9px; margin-top: 12px; font-weight: 700; }
+.case-update-reminder-toggle input { width: 20px; min-height: 20px; margin: 2px 0 0; accent-color: var(--forest-2); }
+.case-update-reminder .field { max-width: 280px; margin-top: 12px; }
 .speech-button { display: inline-flex; width: 32px; min-width: 32px; height: 32px; min-height: 32px; align-items: center; justify-content: center; margin: 0 0 0 6px; padding: 5px; border: 1px solid var(--line); border-radius: 50%; color: var(--forest); background: white; vertical-align: middle; }
 .speech-button:hover, .speech-button[aria-pressed="true"] { color: white; background: var(--forest-2); }
 .speech-button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
@@ -464,6 +470,20 @@ tr th { background-color: #f5f5f5; color: #34433e; }
         <button class="btn btn-primary" id="confirmMicrophonePermission" type="button">Continue to microphone permission</button>
       </div>
     </dialog>
+    <dialog class="help-dialog delete-data-dialog" id="deleteDataDialog" aria-labelledby="deleteDataTitle" aria-describedby="deleteDataDescription">
+      <h2 id="deleteDataTitle">Permanently delete all app data?</h2>
+      <div id="deleteDataDescription">
+        <p>All app data saved on this device will be permanently deleted and cannot be recovered.</p>
+        <p><strong>Do not delete data if it has been requested by subpoena.</strong> If this applies, speak with a lawyer about the subpoena request before taking any action.</p>
+        <p>You can export a backup to keep a copy of the information you entered and remain in control of your data. You can also import that backup if you download this app again in the future.</p>
+        <p>If you choose to permanently delete your data, you may also want to uninstall the app from your device.</p>
+        <p>Do you want to delete all app data?</p>
+      </div>
+      <div class="help-dialog-actions">
+        <button class="btn" id="cancelDeleteData" type="button">Cancel</button>
+        <button class="btn btn-danger" id="confirmDeleteData" type="button">Delete all app data</button>
+      </div>
+    </dialog>
     <!-- Dashboard: case details, progress summary, and upcoming items. -->
     <section class="view active" id="view-overview" data-view="overview">
       <h1 class="page-heading">Dashboard</h1>
@@ -549,7 +569,15 @@ tr th { background-color: #f5f5f5; color: #34433e; }
     <section class="view" id="view-timeline" data-view="timeline">
       <h1 class="page-heading">Case Journey</h1>
       <p class="page-lede">Open the current phase, mark it complete, then save. The app records the date you complete each phase on this device.</p>
-      <section class="panel"><div class="panel-heading"><div><h2>Case stages</h2><p>Only the next incomplete phase can be marked. Saving opens the next phase.</p></div></div><div id="timelineList"></div><div class="form-actions journey-save"><button class="btn btn-primary" id="saveJourneyButton" type="button">Save completed phase</button><span class="form-message" id="journeyMessage" role="status" aria-live="polite"></span></div></section>
+      <section class="panel"><div class="panel-heading"><div><h2>Case stages</h2><p>Only the next incomplete phase can be marked. Saving opens the next phase.</p></div></div><div id="timelineList"></div>
+        <section class="process-block case-update-reminder" aria-labelledby="journeyCaseUpdateReminderTitle">
+          <h3 id="journeyCaseUpdateReminderTitle">Case update reminders</h3>
+          <p>If enabled, you would receive a reminder when the selected number of days has passed without activity since a case phase was completed. Would you like to call your support worker, the investigating officer, or prosecutor for a case update? This prototype saves your preference across both pages but does not currently send these notifications.</p>
+          <label class="case-update-reminder-toggle"><input id="journeyCaseUpdateReminders" type="checkbox">Allow case-stage inactivity reminders</label>
+          <div class="field"><label for="journeyCaseUpdateInterval">Reminder interval</label><select id="journeyCaseUpdateInterval"><option value="30">Every 30 days</option><option value="60">Every 60 days</option><option value="90">Every 90 days</option></select></div>
+        </section>
+        <div class="form-actions journey-save"><button class="btn btn-primary" id="saveJourneyButton" type="button">Save completed phase</button><span class="form-message" id="journeyMessage" role="status" aria-live="polite"></span></div>
+      </section>
     </section>
 
     <!-- Contacts and communication log for the user's support network. -->
@@ -617,7 +645,7 @@ tr th { background-color: #f5f5f5; color: #34433e; }
       </section>
       <section class="panel"><div class="panel-heading"><div><h2>Authoritative South Australian sources</h2><p>Check current official guidance and ask a lawyer about how it applies to your case.</p></div></div><ul class="source-list"><li><a href="https://www.voc.sa.gov.au/going-to-court" target="_blank" rel="noopener">Victims of Crime SA (VOC): going to court</a></li><li><a href="https://www.courts.sa.gov.au/going-to-court/preparing-for-court/witness-victim-in-a-criminal-case/" target="_blank" rel="noopener">SA Courts (Courts Administration Authority): victim or witness in a criminal case</a></li><li><a href="https://www.voc.sa.gov.au/going-to-court/victim-impact-statements" target="_blank" rel="noopener">Victims of Crime SA (VOC): Victim Impact Statements</a></li><li><a href="https://www.voc.sa.gov.au/your-rights/your-rights-as-a-victim-of-crime" target="_blank" rel="noopener">Victims of Crime SA (VOC): rights as a victim of crime</a></li></ul><p class="source-warning">Source links checked 7 October 2026. Websites and laws can change; confirm current information directly with the official source.</p></section>
       <section class="panel">
-        <div class="panel-heading"><div><h2>Questions about what lawyers may ask</h2><p>South Australian Evidence Act 1929, section 34L · plain-English draft</p></div></div>
+        <div class="panel-heading"><div><h2>Questions about what lawyers may ask during cross-examination</h2><p>South Australian Evidence Act 1929, section 34L · plain-English draft</p></div></div>
         <div class="notice danger-note"><strong>Legal review required before publication.</strong> This is a general summary, not legal advice. The exact rules and how they apply depend on the current Act, the question, the evidence, and the case. Ask a qualified South Australian lawyer or witness-support service.</div>
         <details class="process-stage"><summary>Can I be asked about my sexual history?</summary><div class="process-content"><p><strong>Usually, questions about sexual reputation are not allowed.</strong> Questions about sexual activity with other people are generally restricted and may only be allowed if the judge gives permission under the law.</p><p>The judge must consider your dignity and wellbeing. The question must meet the legal test, including being highly relevant and necessary in the interests of justice. This is a summary only; check the current section 34L wording and get legal advice about your case.</p></div></details>
         <details class="process-stage"><summary>Can the defence lawyer ask about sexual activity with another person?</summary><div class="process-content"><p>Usually this evidence is restricted. It is not automatically allowed because a lawyer asks about it. The court decides whether the statutory requirements are met and whether the evidence may be admitted. The exact procedure should be confirmed with your lawyer or witness-support contact.</p></div></details>
@@ -632,6 +660,7 @@ tr th { background-color: #f5f5f5; color: #34433e; }
         <div class="process-block" style="margin-top:15px"><h4>Before making a complaint</h4><p>Consider writing down dates, locations, names, what happened, and what outcome or response you are seeking. Keep copies of relevant records. Ask an independent lawyer or support service what information is safe and useful to provide.</p></div>
         <div class="process-block" style="margin-top:12px"><h4>If the issue happens during a hearing</h4><p>For an urgent concern about a question, treatment, safety, or an accommodation during proceedings, contact your lawyer, prosecutor, or witness-support person promptly and ask how to raise it with the court. A complaint made later may not address an immediate courtroom issue.</p>        <p><a href="https://www.courts.sa.gov.au/going-to-court/preparing-for-court/witness-victim-in-a-criminal-case/" target="_blank" rel="noopener">SA Courts (Courts Administration Authority): victim or witness in a criminal case</a></p></div>
         <div class="process-block" style="margin-top:12px"><h4>Concern about the defence lawyer for the accused</h4><p>The Legal Profession Conduct Commissioner (LPCC) accepts complaints about lawyers practising in South Australia, including another party's lawyer. The LPCC decides whether a complaint is within its role and what action is available. A complaint does not determine the criminal case.</p><p><a href="https://lpcc.sa.gov.au/consumers/complaints" target="_blank" rel="noopener">LPCC information for consumers</a> · <a href="https://lpcc.sa.gov.au/complaint/register" target="_blank" rel="noopener">LPCC online complaint pathway</a></p></div>
+        <div class="process-block" style="margin-top:12px"><h4>Concern about a police officer's conduct</h4><p>If you are concerned about a police officer's conduct, behaviour, or actions, you may be able to make a complaint to the Office for Public Integrity (OPI). Complaints may concern inappropriate conduct, failure to follow procedures, communication, misuse of authority, or other professional-conduct matters. A complaint will not automatically change an investigation or court proceeding. If your concern relates to an active case, consider getting legal advice before lodging a complaint.</p><p><a href="https://www.publicintegrity.sa.gov.au/police-complaints/why-should-i-make-a-report" target="_blank" rel="noopener">Learn more or make a report to the OPI</a></p></div>
         <section class="process-block" style="margin-top:12px">
           <h4>Concern about a judge or magistrate's conduct</h4>
           <div class="notice danger-note"><strong>Offences, penalties and confidentiality</strong>
@@ -664,6 +693,7 @@ tr th { background-color: #f5f5f5; color: #34433e; }
     <section class="view" id="view-documents" data-view="documents">
       <h1 class="page-heading">Documents register</h1>
       <p class="page-lede">Record what exists and where you keep it. Choose a photo or file to try the camera and device picker.</p>
+      <div class="notice danger-note"><strong>Be mindful about what you upload or record.</strong> Information from this app may be requested by subpoena and used in court. This app cannot guarantee confidentiality or legal privilege. If you are unsure what to enter, seek legal advice.</div>
       <section class="panel">
         <div class="panel-heading"><div><h2>Add a photo or document</h2><p>Choose an option to open your camera or select a file from this device.</p></div></div>
         <div class="form-actions" style="margin-top:0">
@@ -744,7 +774,14 @@ tr th { background-color: #f5f5f5; color: #34433e; }
         </section>
         <section class="process-block" id="barrier-withdrawn" style="margin-top:14px"><h3>When charges are withdrawn or the matter is discontinued</h3><p>Ask the prosecutor what happened to the charge, whether the case is finished, and whether any further court date or action is expected. Reasons and available information vary. Ask the prosecutor or lawyer to explain any effect on safety arrangements, orders, or support.</p></section>
         <section class="process-block" id="barrier-acquittal" style="margin-top:14px"><h3>Acquittal (a not guilty verdict)</h3><p>A not guilty verdict means the prosecution did not prove the charge to the required legal standard. It does not establish that you were not believed. Ask the prosecutor to explain the outcome and any next steps; any appeal rights, grounds, and strict time limits depend on the law and circumstances. Support remains available.</p></section>
-        <section class="process-block" id="barrier-delays" style="margin-top:14px"><h3>Long delays</h3><div class="justice-barrier"><strong>One common justice barrier is silence.</strong><p>Long delays can occur for many reasons. If you are concerned, consider contacting:</p><ul><li><a href="#" data-view-target="contacts">Investigating officer</a></li><li><a href="#" data-view-target="contacts">Prosecutor</a></li><li><a href="https://www.voc.sa.gov.au/" target="_blank" rel="noopener">Victims of Crime SA</a></li><li><a href="#" data-view-target="contacts">Your lawyer</a></li></ul><p>Ask who can provide an update and when you should follow up. Contacting an agency does not guarantee a particular date or outcome.</p></div></section>
+        <section class="process-block" id="barrier-delays" style="margin-top:14px"><h3>Long delays</h3><div class="justice-barrier"><strong>One common justice barrier is silence.</strong><p>Long delays can occur for many reasons. If you are concerned, consider contacting:</p><ul><li><a href="#" data-view-target="contacts">Investigating officer</a></li><li><a href="#" data-view-target="contacts">Prosecutor</a></li><li><a href="https://www.voc.sa.gov.au/" target="_blank" rel="noopener">Victims of Crime SA</a></li><li><a href="#" data-view-target="contacts">Your lawyer</a></li></ul><p>Ask who can provide an update and when you should follow up. Contacting an agency does not guarantee a particular date or outcome.</p>
+          <div class="process-block case-update-reminder" aria-labelledby="rightsCaseUpdateReminderTitle">
+            <h3 id="rightsCaseUpdateReminderTitle">Case update reminders</h3>
+            <p>If enabled, you would receive a reminder when the selected number of days has passed without activity since a case phase was completed. Would you like to call your support worker, the investigating officer, or prosecutor for a case update? This prototype saves your preference across both pages but does not currently send these notifications.</p>
+            <label class="case-update-reminder-toggle"><input id="rightsCaseUpdateReminders" type="checkbox">Allow case-stage inactivity reminders</label>
+            <div class="field"><label for="rightsCaseUpdateInterval">Reminder interval</label><select id="rightsCaseUpdateInterval"><option value="30">Every 30 days</option><option value="60">Every 60 days</option><option value="90">Every 90 days</option></select></div>
+          </div>
+        </div></section>
       </section>
       <section class="panel" id="what-happened">
         <div class="panel-heading"><div><h2>What happened?</h2><p>Every situation is different. The prosecution may have ended because:</p></div></div>
@@ -1894,7 +1931,30 @@ Object.assign(window.FRENCH_TRANSLATIONS, {
   "Legal services in South Australia": "Services juridiques en Australie-Méridionale",
   "1800RESPECT — Legal services in South Australia": "1800RESPECT — Services juridiques en Australie-Méridionale",
   "Sexual Violence services in South Australia": "Services de soutien en cas de violence sexuelle en Australie-Méridionale",
-  "Additional information:": "Informations complémentaires :"
+  "Additional information:": "Informations complémentaires :",
+  "Questions about what lawyers may ask during cross-examination": "Questions sur ce que les avocats peuvent demander lors du contre-interrogatoire",
+  "Concern about a police officer's conduct": "Préoccupation concernant la conduite d’un policier",
+  "If you are concerned about a police officer's conduct, behaviour, or actions, you may be able to make a complaint to the Office for Public Integrity (OPI). Complaints may concern inappropriate conduct, failure to follow procedures, communication, misuse of authority, or other professional-conduct matters. A complaint will not automatically change an investigation or court proceeding. If your concern relates to an active case, consider getting legal advice before lodging a complaint.": "Si la conduite, le comportement ou les actes d’un policier vous préoccupent, vous pouvez éventuellement déposer une plainte auprès de l’Office for Public Integrity (OPI). Les plaintes peuvent porter sur une conduite inappropriée, le non-respect des procédures, la communication, l’abus d’autorité ou d’autres questions de déontologie. Une plainte ne modifiera pas automatiquement une enquête ou une procédure judiciaire. Si votre préoccupation concerne une affaire en cours, envisagez de demander un avis juridique avant de déposer une plainte.",
+  "Learn more or make a report to the OPI": "En savoir plus ou faire un signalement à l’OPI",
+  "Be mindful about what you upload or record.": "Soyez attentif aux informations que vous téléversez ou consignez.",
+  "Information from this app may be requested by subpoena and used in court.": "Les informations de cette application peuvent être demandées par assignation et utilisées devant un tribunal.",
+  "This app cannot guarantee confidentiality or legal privilege.": "Cette application ne peut garantir la confidentialité ni le secret professionnel juridique.",
+  "If you are unsure what to enter, seek legal advice.": "En cas de doute sur les informations à saisir, demandez un avis juridique.",
+  "Permanently delete all app data?": "Supprimer définitivement toutes les données de l’application ?",
+  "All app data saved on this device will be permanently deleted and cannot be recovered.": "Toutes les données de l’application enregistrées sur cet appareil seront supprimées définitivement et ne pourront pas être récupérées.",
+  "Do not delete data if it has been requested by subpoena.": "Ne supprimez pas les données si elles ont été demandées par assignation.",
+  "If this applies, speak with a lawyer about the subpoena request before taking any action.": "Si cela vous concerne, demandez conseil à un avocat au sujet de l’assignation avant toute action.",
+  "You can export a backup to keep a copy of the information you entered and remain in control of your data. You can also import that backup if you download this app again in the future.": "Vous pouvez exporter une sauvegarde afin de conserver une copie des informations saisies et de garder le contrôle de vos données. Vous pouvez également importer cette sauvegarde si vous téléchargez à nouveau cette application ultérieurement.",
+  "If you choose to permanently delete your data, you may also want to uninstall the app from your device.": "Si vous choisissez de supprimer définitivement vos données, vous pouvez également désinstaller l’application de votre appareil.",
+  "Do you want to delete all app data?": "Voulez-vous supprimer toutes les données de l’application ?",
+  "Backup restored, but calculation history could not be saved.": "Sauvegarde restaurée, mais l’historique des calculs n’a pas pu être enregistré.",
+  "Case update reminders": "Rappels de suivi du dossier",
+  "If enabled, you would receive a reminder when the selected number of days has passed without activity since a case phase was completed. Would you like to call your support worker, the investigating officer, or prosecutor for a case update? This prototype saves your preference across both pages but does not currently send these notifications.": "Si cette option était activée, vous recevriez un rappel lorsque le nombre de jours choisi s’est écoulé sans activité depuis la fin d’une étape du dossier. Souhaitez-vous appeler votre intervenant de soutien, l’enquêteur ou le procureur pour obtenir des nouvelles ? Ce prototype enregistre votre préférence sur les deux pages, mais n’envoie pas actuellement ces notifications.",
+  "Allow case-stage inactivity reminders": "Autoriser les rappels d’inactivité des étapes du dossier",
+  "Reminder interval": "Fréquence des rappels",
+  "Every 30 days": "Tous les 30 jours",
+  "Every 60 days": "Tous les 60 jours",
+  "Every 90 days": "Tous les 90 jours"
 });
 </script>
 <script>
@@ -2216,7 +2276,7 @@ const defaultData = () => ({
   compensation: { status: "Not started", reference: "", contact: "", deadline: "", payment: "", correspondence: "" },
   vocNavigator: { location: "", role: "", incidentDate: "", reportStatus: "", reportDate: "", evidence: [], impactNotes: "" },
   compensationChecklist: compensationItems.map(() => false), privateNotes: "", visDraft: ["", "", ""], safetyPlan: "",
-  settings: { fontSize: "normal", contrast: "standard", plain: "standard", language: "en", accessCode: "1234", distressCode: "999", sensitiveNotifications: "off", browserNotifications: false, memoryPrivacyWarningDismissed: false, voiceNavigation: false }
+  settings: { fontSize: "normal", contrast: "standard", plain: "standard", language: "en", accessCode: "1234", distressCode: "999", sensitiveNotifications: "off", browserNotifications: false, caseUpdateNotifications: false, caseUpdateInterval: "30", memoryPrivacyWarningDismissed: false, voiceNavigation: false }
 });
 function migrateTimeline(savedTimeline) {
   const oldTitles = {
@@ -2296,6 +2356,8 @@ function readStoredData() {
         distressCode: /^[1-9]\d{2,7}$/.test(String(saved.settings?.distressCode || "")) ? String(saved.settings.distressCode) : defaults.settings.distressCode,
         sensitiveNotifications: saved.settings?.sensitiveNotifications === "on" ? "on" : "off",
         browserNotifications: Boolean(saved.settings?.browserNotifications),
+        caseUpdateNotifications: saved.settings?.caseUpdateNotifications === true,
+        caseUpdateInterval: ["30", "60", "90"].includes(String(saved.settings?.caseUpdateInterval)) ? String(saved.settings.caseUpdateInterval) : defaults.settings.caseUpdateInterval,
         memoryPrivacyWarningDismissed: Boolean(saved.settings?.memoryPrivacyWarningDismissed),
         voiceNavigation: saved.settings?.voiceNavigation === true
       },
@@ -2853,13 +2915,16 @@ function setCalculatorExpression(value) {
 function readCalculatorHistory() {
   try {
     const saved = JSON.parse(localStorage.getItem(CALCULATOR_HISTORY_KEY) || "[]");
-    return Array.isArray(saved)
-      ? saved.filter((entry) => entry && typeof entry.expression === "string" && typeof entry.result === "string" && typeof entry.createdAt === "string").slice(0, 50)
-      : [];
+    return sanitizeCalculatorHistory(saved);
   } catch (error) {
     document.getElementById("calculatorStatus").textContent = "Could not load saved calculation history.";
     return [];
   }
+}
+function sanitizeCalculatorHistory(entries) {
+  return Array.isArray(entries)
+    ? entries.filter((entry) => entry && typeof entry.expression === "string" && typeof entry.result === "string" && typeof entry.createdAt === "string").slice(0, 50)
+    : [];
 }
 function saveCalculatorHistory() {
   try {
@@ -3482,6 +3547,22 @@ function applySettings() {
   updateExitButtonLanguage();
   document.getElementById("accessCodeSetting").value = data.settings.accessCode;
   document.getElementById("distressCodeSetting").value = data.settings.distressCode;
+  syncCaseUpdateReminderControls();
+}
+function syncCaseUpdateReminderControls() {
+  ["journey", "rights"].forEach((page) => {
+    const enabled = document.getElementById(`${page}CaseUpdateReminders`);
+    const interval = document.getElementById(`${page}CaseUpdateInterval`);
+    enabled.checked = data.settings.caseUpdateNotifications;
+    interval.value = data.settings.caseUpdateInterval;
+    interval.disabled = !data.settings.caseUpdateNotifications;
+  });
+}
+function saveCaseUpdateReminderPreference(setting, value) {
+  const previousValue = data.settings[setting];
+  data.settings[setting] = value;
+  if (!persist()) data.settings[setting] = previousValue;
+  syncCaseUpdateReminderControls();
 }
 function renderAll() {
   renderOverview(); renderTimeline(); renderKeySupportPerson(); renderContacts(); renderDocuments(); renderTasks(); renderCommunications(); renderMemories(); renderCompensation(); applySettings();
@@ -3640,7 +3721,7 @@ function checkTaskReminders() {
   });
 }
 function downloadBackup() {
-  const backup = { format: "case-companion-backup", version: 1, exportedAt: new Date().toISOString(), data };
+  const backup = { format: "case-companion-backup", version: 2, exportedAt: new Date().toISOString(), data, calculatorHistory };
   const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
@@ -3653,6 +3734,7 @@ async function restoreBackup(file) {
   try {
     const parsed = JSON.parse(await file.text());
     const candidate = parsed.data || parsed;
+    const restoredCalculatorHistory = sanitizeCalculatorHistory(parsed.calculatorHistory);
     if (!candidate || typeof candidate !== "object" || !candidate.case || !Array.isArray(candidate.contacts) || !Array.isArray(candidate.documents) || !Array.isArray(candidate.tasks) || !Array.isArray(candidate.timeline)) {
       throw new Error("This file does not look like a Case Companion backup.");
     }
@@ -3672,6 +3754,8 @@ async function restoreBackup(file) {
         distressCode: /^[1-9]\d{2,7}$/.test(String(candidate.settings?.distressCode || "")) ? String(candidate.settings.distressCode) : defaults.settings.distressCode,
         sensitiveNotifications: candidate.settings?.sensitiveNotifications === "on" ? "on" : "off",
         browserNotifications: Boolean(candidate.settings?.browserNotifications),
+        caseUpdateNotifications: candidate.settings?.caseUpdateNotifications === true,
+        caseUpdateInterval: ["30", "60", "90"].includes(String(candidate.settings?.caseUpdateInterval)) ? String(candidate.settings.caseUpdateInterval) : defaults.settings.caseUpdateInterval,
         memoryPrivacyWarningDismissed: Boolean(candidate.settings?.memoryPrivacyWarningDismissed),
         voiceNavigation: candidate.settings?.voiceNavigation === true
       }
@@ -3680,7 +3764,12 @@ async function restoreBackup(file) {
     data.messageLog = sanitizeMessageLog(candidate.messageLog);
     migrateCourtDatesToTasks();
     syncCourtDateSurfaces();
-    if (persist()) { fillCaseForm(); renderAll(); alert(localizeMessage("Backup restored.")); }
+    if (persist()) {
+      calculatorHistory = restoredCalculatorHistory;
+      const historySaved = saveCalculatorHistory();
+      fillCaseForm(); renderAll(); renderCalculatorHistory();
+      alert(localizeMessage(historySaved ? "Backup restored." : "Backup restored, but calculation history could not be saved."));
+    }
   } catch (error) {
     console.error("Could not read this backup file.", error);
     alert(localizeMessage("Could not read this backup file."));
@@ -3929,6 +4018,14 @@ document.getElementById("timelineList").addEventListener("change", (event) => {
   journeyStageSelected = target.checked;
   renderTimeline();
 });
+["journey", "rights"].forEach((page) => {
+  document.getElementById(`${page}CaseUpdateReminders`).addEventListener("change", (event) => {
+    saveCaseUpdateReminderPreference("caseUpdateNotifications", event.currentTarget.checked);
+  });
+  document.getElementById(`${page}CaseUpdateInterval`).addEventListener("change", (event) => {
+    saveCaseUpdateReminderPreference("caseUpdateInterval", event.currentTarget.value);
+  });
+});
 document.getElementById("saveJourneyButton").addEventListener("click", () => {
   const stage = data.timeline[pendingJourneyStageIndex];
   if (!stage || stage.done || !journeyStageSelected) return;
@@ -4118,13 +4215,16 @@ document.getElementById("taskCancel").addEventListener("click", () => resetForm(
 document.getElementById("exportButton").addEventListener("click", downloadBackup);
 document.getElementById("importButton").addEventListener("click", () => document.getElementById("importFile").click());
 document.getElementById("importFile").addEventListener("change", (event) => { const file = event.target.files[0]; if (file) restoreBackup(file); event.target.value = ""; });
-document.getElementById("clearDataButton").addEventListener("click", () => {
-  if (!confirm(localizeMessage("Permanently delete all case details, contacts, documents, timeline notes, message activity, and tasks saved by this app on this device? Export a backup first if you may need this information."))) return;
+document.getElementById("clearDataButton").addEventListener("click", () => document.getElementById("deleteDataDialog").showModal());
+document.getElementById("cancelDeleteData").addEventListener("click", () => document.getElementById("deleteDataDialog").close());
+document.getElementById("confirmDeleteData").addEventListener("click", () => {
+  document.getElementById("deleteDataDialog").close();
   data = defaultData();
-  try { localStorage.removeItem(STORAGE_KEY); } catch (error) { persist(); }
+  calculatorHistory = [];
+  try { localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(CALCULATOR_HISTORY_KEY); } catch (error) { persist(); }
   resetForm("memoryForm", "memoryFormHeading", "Record an additional recollection", "memorySubmit", "Save recollection", "memoryCancel");
   document.getElementById("memoryRememberedDate").value = todayISO();
-  fillCaseForm(); renderAll();
+  fillCaseForm(); renderAll(); renderCalculatorHistory();
   document.getElementById("privateNotes").value = "";
   ["visImpact", "visSupport", "visQuestions"].forEach((id) => { document.getElementById(id).value = ""; });
   document.getElementById("safetyPlan").value = "";
